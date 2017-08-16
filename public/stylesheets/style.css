@@ -1,0 +1,34 @@
+.v-board {
+  max-width: 600px;
+  margin: 0 auto; }
+  .v-board h3 {
+    margin: 5px 0 15px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+    color: olive; }
+
+.board-section {
+  position: absolute;
+  width: 600px;
+  padding: 10px;
+  margin: 20px 0;
+  border: 1px solid #ddd;
+  overflow: hidden;
+  border-radius: 7px; }
+
+.btns {
+  float: right; }
+
+.write_form textarea {
+  width: 100%; }
+
+.modify_form textarea {
+  width: 100%; }
+
+.Page.navigation {
+  width: 100%; }
+  .Page.navigation .pagination {
+    margin: 0 auto;
+    border: 1px solid red; }
+
+/*# sourceMappingURL=style.css.map */

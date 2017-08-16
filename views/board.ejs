@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>BOARD</title>
+  <link rel="stylesheet" href='/stylesheets/style.css' />
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+    crossorigin="anonymous">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
+    crossorigin="anonymous">
+
+</head>
+<!--
+게시판 리스트 보기,
+검색하기,
+쓰기,
+파일첨부하기,
+수정하기,
+삭제하기
+-->
+
+<body>
+
+  <div id="v-board" class="v-board">
+    <!-- list -->
+    <div class="board-list">
+      <a href="/boards">
+        <h1>게시판</h1>
+      </a>
+      <table class="board_list table">
+        <tr>
+          <th class="board-list-no">No.</th>
+          <th class="board-list-title">Title</th>
+          <th>Writer</th>
+          <th>Date</th>
+          <th>Count</th>
+        </tr>
+        <tr v-for="(item, idx) in items">
+          <td class="number">
+            {{ idx }}
+          </td>
+          <td class="title">
+            <!-- <a v-bind:href="'/boards/view?id='+ item._id"  > -->
+            <a v-on:click="getDetail(item._id)">
+                  {{ item.title }}
+                </a>
+          </td>
+          <td class="writer">
+            {{item.writer}}
+          </td>
+          <td class="date">
+            {{ formateDate( item.date ) }}
+          </td>
+          <td class="cnt">
+            {{ item.count }}
+          </td>
+        </tr>
+      </table>
+      <button v-on:click="showAddNew()">새 글</button>
+      <form action="/boards/search" method="get" id="searchAction" name="searchAction">
+        <input type="text" class="search_word" id="searchWord" name="searchWord">
+        <button type="button" onclick="searchContent();">검색</button>
+      </form>
+    </div>
+    <!--// list -->
+
+    <!-- new content write form: 새글 쓰기 UI -->
+    <div v-show="onAddNew" id="" class="write_form board-section">
+        <h3>게시글 작성하기</h3>
+        <form id="writeAction" action="/boards?mode=add" method="post" enctype="multipart/form-data">
+          <!-- <form id="writeAction" action="/boards/loadFile" method="post" enctype="multipart/form-data"> -->
+          <input type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
+          <input type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
+          <input type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
+          <textarea class="textContents" id="addContents" name="addContents" rows="10" cols="80"></textarea>
+          <input type="file" class="inputFile" id="UploadFile" name="UploadFile">
+        </form>
+        <div id="new" class="btns">
+          <button v-on:click="addItemComp">작성완료</button>
+          <button v-on:click="addItemCancle">작성취소</button>
+        </div>
+      </div>
+      <!--// new content write form: 새글 쓰기 UI -->
+
+    <!-- board detail -->
+    <div v-show="onDetail" class="board-detail board-section">
+        <h3>게시글 자세히 보기</h3>
+        <div class="content-title">제목: {{ detail.title }}</div>
+        <div class="content-info">작성일: {{ formateDate( detail.date) }}</div>
+        <div class="detail-writer">작성자: {{ detail.writer }}</div>
+        <div class="content-text">
+          <p class="title">내용</p>
+          <hr>
+          <div class="detail-contents">{{ detail.contents }}</div>
+        </div>
+        <div class="download-file"></div>
+        <div class="addBtngroup btns">
+          <button v-on:click="modifyItem">수정</button>
+          <button v-on:click="deleteItem">삭제</button>
+          <!-- <button href="/boards">확인</button> -->
+          <div class="clear"></div>
+        </div>
+        <!-- delete confirm window -->
+        <div class="boardDetailDel delete_confirm">
+          <h1>비밀 번호를 입력하면 글이 삭제됩니다</h1>
+          <input type="password" id="delPassword" name="delPassword">
+          <button v-on:click="">삭제</button>
+          <button v-on:click="">취소</button>
+        </div>
+        <!-- end -->
+        <div class="clear"></div>
+      </div>
+      <!--// board detail -->
+
+      <!-- modify -->
+      <div v-show="onModify" id="" class="modify_form board-section">
+        <h3>게시글 수정하기</h3>
+        <form id="modify-action" action="/boards/?mode=modify" method="post">
+          <!-- 경로 설정 /: 이거 뭔가 해야징-->
+          <input type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
+          <input type="password" class="inputPassword" id="modContentPassword" name="modContentPassword" placeholder="비밀번호">
+          <span class="modWriter" id="modContentWriter" name="modContentWriter"></span>
+          <textarea class="textContents" id="modContents" name="modContents" rows="20" cols="80"></textarea>
+
+          <!-- <input type="hidden" id="modId" name="modId" value="<%=contents._id%>"> -->
+          <input type="hidden" id="modId" name="modId">
+        </form>
+        <div class="btns">
+          <button v-on:click="modifyItemComp">수정완료</button>
+          <button v-on:click="modifyItemCancle">수정취소</button>
+        </div>
+      </div>
+      <!--// modify -->
+    
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+
+  <script src="/javascripts/moment.js"></script>
+  <script src="https://unpkg.com/vue"></script>
+  <script src="/javascripts/boardMain.js"></script>
+
+</body>

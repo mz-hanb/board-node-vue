@@ -1,0 +1,51 @@
+$color-line: #ddd;
+
+.v-board{
+  max-width: 600px;
+  margin: 0 auto;
+
+  h3{
+    margin: 5px 0 15px 0;
+    padding: 5px 0;
+    border-bottom: 1px solid $color-line;
+    color: olive;
+  }
+}
+
+.board-section{
+  position: absolute;  
+  width: 600px;
+  padding: 10px;
+  margin: 20px 0;
+  border: 1px solid $color-line;
+  overflow: hidden;
+  border-radius: 7px;
+}
+
+.board-list{   
+}
+
+.btns{
+  float: right;
+}
+
+//--- 새글 작성
+.write_form{
+  textarea{
+    width: 100%;
+  }
+}
+
+//--- 수정하기
+.modify_form{
+  textarea{
+    width: 100%;
+  }
+}
+.Page.navigation{
+  width: 100%;
+  .pagination{
+    margin: 0 auto;
+    border: 1px solid red;
+  }
+}
