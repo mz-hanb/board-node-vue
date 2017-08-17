@@ -16,16 +16,29 @@
 
 </head>
 <!--
+
+//--- done
 게시판 리스트 보기,
 검색하기,
 쓰기,
-파일첨부하기,
 수정하기,
-삭제하기
+삭제하기,
+페이징,
+비밀번호 맞는지여부,
+override method: delete, push
+
+//--- have to 
+파일첨부하기
+
+
+//--- 질문
+- 삭제글을 flag로 처리하는 이유( remove? drop 이아니라 )
+- 서버쪽에서 에러가 났을때 frontend 단으로 전송하는 방식: error 처리
+
+
 -->
 
 <body>
-
   <div id="v-board" class="v-board">
     <!-- list -->
     <div class="board-list">
@@ -46,7 +59,7 @@
           </td>
           <td class="title">
             <!-- <a v-bind:href="'/boards/view?id='+ item._id"  > -->
-            <a v-on:click="getDetail(item._id)">
+            <a v-on:click="showDetail(item._id)">
                   {{ item.title }}
                 </a>
           </td>
@@ -61,27 +74,45 @@
           </td>
         </tr>
       </table>
-      <button v-on:click="showAddNew()">새 글</button>
-      <form action="/boards/search" method="get" id="searchAction" name="searchAction">
-        <input type="text" class="search_word" id="searchWord" name="searchWord">
-        <button type="button" onclick="searchContent();">검색</button>
-      </form>
+      <hr>
+      <div class="btns">
+          <form action="/boards/search" method="get" id="action-search" name="action-search">
+            <input v-model="searchWord" type="text" class="search_word" id="searchWord" name="searchWord">        
+            <button type="button" v-on:click="searchItemSubmit">검색</button>
+          </form>
+        <button v-on:click="showAddNew()">새 글</button>
+      </div>      
+      <nav class="pagination-wrap" aria-label="Page navigation">
+        <ul class="pagination">
+          <li class="btn-prev-pagegroup">
+            <a v-on:click="goPrevPageGroup" href="#" aria-label="Previous">
+              <span aria-hidden="true">&laquo;</span>
+            </a>
+          </li>          
+          <li v-for="(pageItem, idx) in objPage.listCurrent" ><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>          
+          <li class="btn-next-pagegroup">
+            <a v-on:click="goNextPageGroup" href="#" aria-label="Next">
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+          </li>
+        </ul>
+      </nav>      
     </div>
     <!--// list -->
 
     <!-- new content write form: 새글 쓰기 UI -->
     <div v-show="onAddNew" id="" class="write_form board-section">
         <h3>게시글 작성하기</h3>
-        <form id="writeAction" action="/boards?mode=add" method="post" enctype="multipart/form-data">
+        <form id="write-action" action="/boards?mode=add" method="post" enctype="multipart/form-data">
           <!-- <form id="writeAction" action="/boards/loadFile" method="post" enctype="multipart/form-data"> -->
-          <input type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
-          <input type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
-          <input type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
-          <textarea class="textContents" id="addContents" name="addContents" rows="10" cols="80"></textarea>
+          <input v-model="newItem.title" type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
+          <input v-model="newItem.writer" type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
+          <input v-model="newItem.password" type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
+          <textarea v-model="newItem.contents"  class="textContents" id="addContents" name="addContents" rows="10" cols="80"></textarea>
           <input type="file" class="inputFile" id="UploadFile" name="UploadFile">
         </form>
         <div id="new" class="btns">
-          <button v-on:click="addItemComp">작성완료</button>
+          <button v-on:click="addItemSubmit">작성완료</button>
           <button v-on:click="addItemCancle">작성취소</button>
         </div>
       </div>
@@ -90,27 +121,28 @@
     <!-- board detail -->
     <div v-show="onDetail" class="board-detail board-section">
         <h3>게시글 자세히 보기</h3>
-        <div class="content-title">제목: {{ detail.title }}</div>
-        <div class="content-info">작성일: {{ formateDate( detail.date) }}</div>
-        <div class="detail-writer">작성자: {{ detail.writer }}</div>
+        <div class="content-title"><span class="title-label">제목</span>: {{ detail.title }}</div>
+        <div class="content-info"><span class="title-label">작성일</span>: {{ formateDate( detail.date) }}</div>
+        <div class="detail-writer"><span class="title-label">작성자</span>: {{ detail.writer }}</div>
+        
         <div class="content-text">
-          <p class="title">내용</p>
-          <hr>
+          <p class="title-label">내용</p>                    
           <div class="detail-contents">{{ detail.contents }}</div>
         </div>
-        <div class="download-file"></div>
-        <div class="addBtngroup btns">
+        <div class="download-file">{{addFile}}</div>
+        <div class="btns">
           <button v-on:click="modifyItem">수정</button>
-          <button v-on:click="deleteItem">삭제</button>
+          <!-- <button v-on:click="deleteItem">삭제</button> -->
           <!-- <button href="/boards">확인</button> -->
           <div class="clear"></div>
         </div>
+        <div class="clear"></div>
         <!-- delete confirm window -->
-        <div class="boardDetailDel delete_confirm">
-          <h1>비밀 번호를 입력하면 글이 삭제됩니다</h1>
-          <input type="password" id="delPassword" name="delPassword">
-          <button v-on:click="">삭제</button>
-          <button v-on:click="">취소</button>
+        <div class="delete_confirm">
+              <span>비밀 번호를 입력하면 글이 삭제됩니다.</span><br>
+              <input v-model="delPw" type="password" id="delPassword" name="delPassword">
+              <button v-on:click="deleteItem">삭제</button>
+              <button v-on:click="deleteItemCancle">취소</button>            
         </div>
         <!-- end -->
         <div class="clear"></div>
@@ -122,13 +154,13 @@
         <h3>게시글 수정하기</h3>
         <form id="modify-action" action="/boards/?mode=modify" method="post">
           <!-- 경로 설정 /: 이거 뭔가 해야징-->
-          <input type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
+          <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
           <input type="password" class="inputPassword" id="modContentPassword" name="modContentPassword" placeholder="비밀번호">
-          <span class="modWriter" id="modContentWriter" name="modContentWriter"></span>
-          <textarea class="textContents" id="modContents" name="modContents" rows="20" cols="80"></textarea>
+          <span class="modWriter" id="modContentWriter" name="modContentWriter">작성자: {{detail.writer}}</span>
+          <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" rows="5" cols="80"></textarea>
 
           <!-- <input type="hidden" id="modId" name="modId" value="<%=contents._id%>"> -->
-          <input type="hidden" id="modId" name="modId">
+          <input type="hidden" id="modId" name="modId" v-bind:value="detail._id">
         </form>
         <div class="btns">
           <button v-on:click="modifyItemComp">수정완료</button>

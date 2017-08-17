@@ -1,10 +1,5 @@
-$(function(){
-  /*
-var page = location.href.split("page=")[1]; // url에 page 넘버로 구분
-var index = page - 1; // 0부터 시작이므로 1 빼줌
-var $boardDetailDel = $('.boardDetailDel');
-
-
+// $(function(){
+/*
 var fileUp = '{{ detail.fileUp }}';
 var files = '';
 var cnt = '';
@@ -22,9 +17,7 @@ if (fileUp != "") {
 }
 $('.download-file').html(output);
 
-var storage = {
-  currentObj: {}
-}
+
 */
 
 // if (page == null) { // 메인화면에서는 page 쿼리가 없으므로 빈값일 때
@@ -38,39 +31,103 @@ var storage = {
  * *********************************************/
 
 // 게시판
-var boarList = new Vue({
+var boardList = new Vue({
   el: '#v-board',
   data: {
-    items: [],
-    pages: '1', 
-    detail: {}, 
+    items: [],    
+    objPage: {
+      list: [], 
+      listCurrent: [],
+      total: 1, 
+      groupTotal: 1,
+      groupCurrent: 1,
+      groupLimit: 5
+    },        
+    detail: {},
+    delPw: '',
+    newItem: {
+      title: '',
+      writer: '',
+      password: '',
+      contents: ''
+    },
+    searchWord: '', 
     onDetail: false,
     onAddNew: false,
     onModify: false
-  },    
-  computed: {    
-    
   },
-  methods: {    
-    getDetail: function(id) {
+  computed: {
+    addFile: function(){       
+      var dataFile = this.detail.fileUp;
+      if( dataFile ){        
+
+      }
+      return '';
+    }
+  },
+    methods: {   
+    getPage: function(page, searchWord ) {      
+      var self = this; 
+      var thisPage = this.objPage;
+      if( page === null || page === undefined ) page = 1;
+      if( searchWord === null || searchWord === undefined ) searchWord = '';
+
+      $.get('/boards-api/get-list?page=' + page + '&searchWord='+searchWord, function(data, status) {
+        self.items = data.contents;            
+        thisPage.total = data.pagination;
+        
+        for( var i = 0; i < thisPage.total; i++){
+          // 전체리스트
+          thisPage.list.push({page: i+1, pageGroup: Math.ceil( (i+1)/thisPage.groupLimit ) } );
+        }
+        // 그룹 총 개수 
+        thisPage.groupTotal = Math.ceil( thisPage.total / thisPage.groupLimit );
+        // 현재페이지의 페이지그룹 알아내기: 페이지네비의 보여줄 그룹을 셋팅하기 위해
+        var objCurrentPage = thisPage.list.filter(function(item, index, array){          
+          if( item.page === page ) return item;
+        });
+        thisPage.groupCurrent = objCurrentPage[0].pageGroup;        
+        self.getCurrentPageList();                                
+      })      
+    }, 
+    showDetail: function(id) {
       var self = this;
-      $.get('/boards/view?id=' + id, function(data, status) {
+      $.get('/boards-api/view?id=' + id, function(data, status) {
         self.detail = data.content;                 
         self.items.forEach(function(item, idx){
           if(item._id == self.detail._id ) item.count++;
         });
         self.initView();
-        self.onDetail = true;
+        self.onDetail = true;        
       })
     },
-    getPage: function(page) {      
+    searchItemSubmit: function(){
+      console.log( this.searchWord );      
+      if( this.searchWord === '' ){
+        alert("검색어를 입력해주세요!!!");        
+      }else{        
+        this.getPage(1, this.searchWord );
+      }      
+    },    
+    addItemSubmit: function(){     
+      if( this.newItem.title === '' || this.newItem.writer === ' '|| this.newItem.password === '' || this.newItem.contents === '' ){
+        alert("제목과 내용, 작성자 비밀번호 모두 있어야합니다.");
+        return;
+      }
       var self = this;
-      $.get('/boards/get-list?page=1', function(data, status) {
-        self.items = data.contents;               
-      })      
-    },
-    addItemComp: function(){
-
+      var form = $('#write-action')[0];
+      var formData = new FormData(form);
+      $.ajax({
+        type: 'POST',
+        url: '/boards-api?mode=add',
+        processData: false,
+        contentType: false,
+        data: formData,
+        success: function(result){
+          self.initView();
+          self.getPage();                    
+        }
+      });
     },
     addItemCancle: function(){
       this.onAddNew = false;      
@@ -80,247 +137,95 @@ var boarList = new Vue({
       this.onModify = true;
     },
     modifyItemComp: function(){
-
+      var self = this;   
+      $.ajax({
+        type: 'POST',         
+        url: '/boards-api?_method=PUT',                
+        data: $('#modify-action').serialize(),
+        async: false,
+        success: function(data) {      
+          if( data.error ){
+            alert('비밀번호가 일치하지 않습니다.');
+          }else{
+            self.initView();
+            self.getPage();          
+          }                 
+        }
+      });
     },
     modifyItemCancle: function(){
       this.onModify = false;      
     },
     deleteItem: function(){
-      this.initView();
-      // this.onModify = true;
+      var self = this;
+      $.ajax({
+        type: 'POST',         
+        url: '/boards-api?_method=DELETE&id=' + this.detail._id + '&pw=' + this.delPw,
+        success: function(data){
+          if( data.error ){
+            alert('비밀번호가 일치하지 않습니다.');
+          }else{
+            self.initView();      
+            self.getPage();
+          }       
+        }
+      });
     },
+    deleteItemCancle: function(){
+      // this.onDetail = false      
+    },    
     formateDate: function(date){
       return moment(date).format('YYYY-MM-DD, h:mm:ss a') ;
     },
     showAddNew: function(){
       this.initView();
       this.onAddNew = true;
-    },
+    },  
     initView: function(){
       this.onDetail = false;
       this.onAddNew = false;
       this.onModify = false;
-    }
+      this.delPw = '';
+
+      for( var key in this.newItem ){
+        this.newItem[key] = '';
+      }      
+    },
+    goPrevPageGroup: function(){        
+      this.objPage.groupCurrent--;             
+      this.getCurrentPageList();
+    },
+    goNextPageGroup: function(){         
+      this.objPage.groupCurrent++;            
+      this.getCurrentPageList();
+    },
+    getCurrentPageList: function(){           
+      if( this.objPage.groupCurrent <= 0 ){
+        this.objPage.groupCurrent = 1;
+        return;
+      } 
+      if( this.objPage.groupCurrent > this.objPage.groupTotal ){
+        this.objPage.groupCurrent = this.objPage.groupTotal;
+        return;
+      } 
+      var thisPage = this.objPage;
+      var startNum = (thisPage.groupCurrent-1) *5;
+      var endNum = thisPage.groupCurrent * 5;          
+      if( endNum > this.objPage.total ) endNum = this.objPage.total;
+
+      thisPage.listCurrent = thisPage.list.slice(startNum, endNum); 
+    }  
   }
 })
 
-boarList.getPage();
-console.log( boarList.detailShow );
+boardList.getPage();
 
-//--- get board list: 페이지 로딩시 요청
-function getList() {
-  $.get('/boards/get-list?page=1', function(data, status) {
-    boarList.items = data.contents;
-    boarList.pages = data.pagination;
-    // $('.board-section').hide();
-    // $('#searchAction input').val('');
-  });
-}
+// function downloadFiles(filepath) {
+//   var path = filepath;
+//   if (confirm("파일이 다운로드 됩니다.") == true) {
+//     // location.href = "/boards/download/" + path;
+//     // getList();
+//   }
+// }
 
-//--- show UIs
-function showSection(stId) {
-  $('.board-section').hide();
-  $('#' + stId).show();
-  // 새글 입력폼 초기화
-  $('#writeAction input').val('');
-  $('#writeAction textarea').val('');
-}
-
-function cancelWriteForm(option) {
-  if (option == 'cancel') $('.write_form').fadeOut();
-  if (option == 'ok') $('.content_box').fadeOut();
-}
-
-//=== 새글 등록
-function submitContents() {
-  var title = $('#addContentSubject').val();
-  var content = $('#addContents').val();
-  var writer = $('#addContentWriter').val();
-  var password = $('#addContentPassword').val();
-
-  // 새 글 등록 시
-  if (title == '' || content == '' || writer == '' || password == '') {
-    alert("제목과 내용, 작성자 비밀번호 모두 있어야합니다.");
-    return;
-  } else {
-    // $('#writeAction').submit();
-    uploadFile();
-  }
-}
-//=== upload file
-function uploadFile(){
-  var form = $('#writeAction')[0];
-  var formData = new FormData(form);
-  $.ajax({
-    url: '/boards?mode=add',
-    processData: false,
-    contentType: false,
-    data: formData,
-    type: 'POST',
-    success: function(result){
-      getList();      
-      // alert('success');
-    }
-  });
-}
-
-//=== 검색
-function searchContent() {
-  if ($('#searchWord').val() === '') {
-    alert("검색어를 입력해주세요!!!");
-  } else {    
-    $.ajax({
-      url: '/boards/search',
-      data: $('#searchAction').serialize(),      
-      success: function(data) {
-        boarList.items = data.contents;
-      }
-    });
-  }
-}
-
-function downloadFiles(filepath) {
-  var path = filepath;
-  if (confirm("파일이 다운로드 됩니다.") == true) {
-    // location.href = "/boards/download/" + path;
-    // getList();
-  }
-}
-
-//=== 수정
-function modifyContents() {
-  // 글 수정 버튼 눌렀을 때 화면 전환 시
-  showSection('boardModify');
-  $('.modSubject').val(boardDetail.detail.title);
-  $('.modWriter').text(boardDetail.detail.writer);
-  $('.textContents').html(boardDetail.detail.contents);
-}
-
-function checkPW(inputPassword) {
-  var result = '';
-
-  $.ajax({
-    // url: '/boards/password/?id=<%=content._id%>',
-    url: '/boards/password/?id=' + boardDetail.detail._id,
-    async: false,
-    success: function(password) {
-      if (inputPassword == password) result = true;
-      else result = false;
-    }
-  });
-  return result;
-}
-
-//=== 게시글 수정
-function modifySubmitContents() {
-  // 글 수정후 db 저장 시 비번 확인 후 맞으면 수정으로 submit
-  var title = $('#modContentSubject').val();
-  var content = $('#modContents').val();
-  var inputPassword = $('#modContentPassword').val();
-  var chkpw = checkPW(inputPassword);
-
-  if (chkpw == true) {
-    if (title == '' || content == '') {
-      alert("제목과 내용 모두 있어야합니다.");
-      return;
-    } else {
-      // $('#modifyAction').submit();
-      $.ajax({
-        type: "POST",
-        url: 'boards?mode=modify',
-        data: $('#modifyAction').serialize(),
-        async: false,
-        success: function(data) {
-          // boarList.items = data.contents;
-          getList();
-        }
-      });
-
-
-    }
-  } else {
-    alert("글 작성 시 입력한 비밀 번호를 입력해주세요");
-    return;
-  }
-
-}
-
-//=== 취소
-function cancelForm(option) {
-  if (option == 'modify') {
-    // 수정하다 취소시
-    $('.content_detail').show();
-    $('.modify_form').hide();
-  } else {
-    $('.delete_confirm').hide();
-  }
-
-}
-//=== 글지우기 ui 보기
-function deleteContents() {
-  // 글 삭제시 비번 확인 후 맞으면 삭제로 submit
-  $('.boardDetailDel').show();
-}
-
-function deleteConfirm() {
-  var inputPassword = $('#delPassword').val();
-  var chkpw = checkPW(inputPassword);
-
-  if (chkpw == true) {
-    // location.href='/boards/delete?id=<%=content._id%>';
-    // location.href='/boards/delete?id=' + boardDetail.detail._id;
-    $.get('/boards/delete?id=' + boardDetail.detail._id, function(data, status) {
-      console.log('//////////////////////////deleteConfirm');
-      getList();
-    }).fail(function() {
-      console.log("fail");
-    })
-
-  } else {
-    alert("글 작성 시 입력한 비밀 번호를 입력해주세요");
-    return;
-  }
-}
-
-function changePage(page) {
-  $.get('/boards/reply?id=<%=content._id%>&page=' + page + "&max=<%=content.comments.length%>", function(replyList) {
-    var output = '';
-    for (var i = 0; i < replyList.length; i++) {
-      output += '<div class="reply_content"><div class="reply_info">' + replyList[i].name + ' / ' + dateFormatChangeScript(replyList[i].date) + '</div>';
-      output += '<div class="reply_text">' + replyList[i].memo.replace(/\\r\\n/gi, " ") + '</div></div>';
-    }
-
-    $('.reply_list').html(output);
-  });
-
-  $.ajax({
-    url: '/boards/reply?id=<%=content._id%>&page=' + page + "&max=<%=content.comments.length%>",
-    type: "get",
-    success: function(data) {
-      var output = '';
-      for (var i = 0; i < data.length; i++) {
-        output += '<div class="reply_content"><div class="reply_info">' + data[i].name + ' / ' + dateFormatChangeScript(data[i].date) + '</div>';
-        output += '<div class="reply_text">' + data[i].memo.replace(/\\r\\n/gi, " ") + '</div></div>';
-      }
-
-      $('.reply_list').html(output);
-    }
-  });
-}
-
-function dateFormatChangeScript(date) {
-  var newdate = new Date(date);
-  var options = {
-    weekday: "short",
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  };
-  return newdate.toLocaleTimeString("ko-KR", options);
-}
-
-  
-}());
-
+// }());

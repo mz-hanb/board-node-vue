@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>ABL 인터넷보험 - MissionL</title>
+    
+    <link href="/Content/reset.css" rel="stylesheet" />
+    
+    <link href="/Content/MissionL/css/event.min.css" rel="stylesheet"/>
+
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+
+
+    <script src="/bundles/jquery?v=FVs3ACwOLIVInrAl5sdzR2jrCDmVOWFbZMY6g6Q0ulE1"></script>
+
+    
+    <script src="/bundles/modernizr?v=wBEWDufH_8Md-Pbioxomt90vm6tJN2Pyy9u9zHtWsPo1"></script>
+
+    <script type="text/javascript" src="/Content/js/jquery.shy4blue.placeholder.js"></script>
+</head>
+<body>
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+            m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-103561242-1', 'auto');
+        ga('send', 'pageview');
+
+    </script>
+    
+
+<div class="event-wrap" id="mission-l">
+    <h1 class="logo"><img src="/Images/MissionL/w/logo.png" alt="ABL 인터넷보험"></h1>
+    <div class="inner">
+        <div class="event-header">
+            <h2>
+                <span class="stl animated bounceInDown"><img src="/Images/MissionL/w/stl_event.png" alt="알리안츠생명 올라잇의 새이름 ABL인터넷보험"></span>
+                <span class="tl-top animated bounceInDown"><img src="/Images/MissionL/w/tl_event_top.png" alt="ABL인터넷보험의"></span>
+                <span class="tl-txt1 animated bounceInLeft"><img src="/Images/MissionL/w/tl_event1.png" alt="이름을"></span>
+                <span class="tl-txt2 animated bounceInDown"><img src="/Images/MissionL/w/tl_event2.png" alt="완성"></span>
+                <span class="tl-txt3 animated bounceInRight"><img src="/Images/MissionL/w/tl_event3.png" alt="하라"></span>
+                <span class="tl-txt4 animated bounceInRight"><img src="/Images/MissionL/w/tl_event4.png" alt="!"></span>
+                <span class="tl-flag animated fadeInDown"><img src="/Images/MissionL/w/tl_flag.png" alt="MISSION L"></span>
+            </h2>
+        </div>
+        <div class="slot-machine">
+            <div class="slot-cover"><img src="/Images/MissionL/w/slot_cover.jpg" alt=""></div>
+            <div class="machine-box">
+                <ul id="slotMachine" class="slotMachine">
+                    <li>
+                        <img src="/Images/MissionL/w/slot_win.png" alt="L">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_fail1.png" alt="꽝">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_fail2.png" alt="꽝">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_win.png" alt="L">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_fail3.png" alt="꽝">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_fail4.png" alt="꽝">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_win.png" alt="L">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_fail5.png" alt="꽝">
+                    </li>
+                    <li>
+                        <img src="/Images/MissionL/w/slot_fail6.png" alt="꽝">
+                    </li>
+                </ul>
+            </div>
+            <div class="shadow"><img src="/Images/MissionL/w/slot_sh.png" alt=""></div>
+        </div>
+        <p class="txt-mission"><img src="/Images/MissionL/w/txt_mission.png" alt="ABL 인터넷보험 이름을 완성해주세요!"></p>
+        <div class="btn-start" id="playBtn">
+            <img src="/Images/MissionL/w/btn_mission_start.png" class="ga-event" data-action="게임시작" alt="게임시작!">
+            <div class="loading" style="display:none;"><img src="/Images/MissionL/pop/loading.gif" alt="loading"></div>
+        </div>
+        <p class="desc-start"><img src="/Images/MissionL/w/desc_start.png" alt="‘게임시작’ 버튼을 클릭하시면 게임이 시작됩니다."></p>
+        <div class="gifts"><img src="/Images/MissionL/w/event_gifts.jpg" alt="순금 한돈 골드바 / 이마트&GS칼텍스 기프티콘 / BHC 치킨 기프티콘 / 오니기리 카카오톡 이모티콘"></div>
+    </div>
+    <audio id="slotBGM" controls preload>
+        <source src="/Images/MissionL/slot_bgm.mp3" type="audio/mpeg" />
+        이 브라우저는 audio형식을 지원하지 않습니다.
+    </audio>
+</div>
+
+<!-- 팝업 : dimmed -->
+<div id="png-bg" style="display:none;"></div>
+
+<!-- 팝업 : 개인정보입력 -->
+<div class="popup pop-entry" id="pop-entry">
+    <div class="btn-close"><a href="javascript:;" onclick="closePop('entry'); return false;"><img src="/Images/MissionL/pop/btn_close.png" alt="닫기"></a></div>
+    <div class="pop-header">
+        <h3><img src="/Images/MissionL/pop/tl_entry.png" alt="개인정보 입력"></h3>
+        <p><img src="/Images/MissionL/pop/txt_entry.png" alt="경품 당첨시 배송을 위해 개인정보를 입력해주세요!"></p>
+    </div>
+    <div class="pop-con">
+<form action="/api/mission-l/create" data-ajax="true" data-ajax-begin="missionLModel.beginEntry" data-ajax-complete="missionLModel.completeEntry" data-ajax-failure="missionLModel.failEntry" data-ajax-method="post" data-ajax-success="missionLModel.successEntry" id="frmMissionLEntry" method="post">            <fieldset>
+                <div class="reg-con">
+                    <div class="info-area">
+                        <dl class="info-name">
+                            <dt><img src="/Images/MissionL/pop/tl_name.png" alt="이름"></dt>
+                            <dd>
+                                <input data-val="true" data-val-maxlength="이름을 50자 이내로 입력해주세요." data-val-maxlength-max="50" data-val-regex="이름은 한글 또는 영문으로만 입력 가능합니다." data-val-regex-pattern="[a-zA-Z가-힣]+$" data-val-required="이름을 입력 해주세요." id="Name" maxlength="20" name="Name" type="text" value="" />
+                            </dd>
+                        </dl>
+                        <dl class="info-phone">
+                            <dt><img src="/Images/MissionL/pop/tl_phone.png" alt="연락처"></dt>
+                            <dd>
+                                <input data-val="true" data-val-maxlength="연락처를 11자 이내로 입력해주세요." data-val-maxlength-max="11" data-val-regex="연락처를 정확히 입력해주세요. ex) 01012345678" data-val-regex-pattern="^(010|011|016|017|019)[0-9]{7,8}$" data-val-required="연락처를 입력 해주세요." id="Mobile" maxlength="11" name="Mobile" type="tel" value="" />
+                            </dd>
+                        </dl>
+                    </div>
+                    <!-- //form_box -->
+                    <!-- agreement_box -->
+                    <div class="policy-area">
+                        <p class="policy-check">
+                            <label>
+                                <input data-val="true" data-val-assertthat="개인정보 수집 및 활용에 동의 해주세요." data-val-assertthat-expression="&quot;Agree == true&quot;" data-val-assertthat-fieldsmap="{&quot;Agree&quot;:&quot;bool&quot;}" data-val-required="개인정보 수집 및 활용에 동의 해주세요." id="Agree" name="Agree" type="checkbox" value="true" /><input name="Agree" type="hidden" value="false" />
+                                <span>이벤트 참여를 위한 개인정보 수집에 동의합니다.</span>
+                            </label>
+                        </p>
+                        <style>
+.personal-info-desc {width:auto; margin:0 auto;}
+.personal-info-desc .personal-info-box {line-height: 1.4; font-size: 14px; padding-bottom:30px;}
+.personal-info-desc .personal-info-box > p { line-height: 1.5; }
+.personal-info-desc .personal-info-box dt { margin: 10px 0 0; padding-left:0 !important ;}
+.personal-info-desc .personal-info-box dd {margin:0;}
+.personal-info-desc .personal-info-box span {color:red;}
+</style>
+
+<dl class="personal-info-desc">
+    
+    <dd>
+        <div class="personal-info-box">
+            <p>ABL생명은 회사 홍보 이벤트를 위해 필요한 최소한의 개인정보만을 수집하며, 고객님은 본 동의를 거부하실 수 있으나 이를 거부하시는 경우 이벤트 응모 및 경품 배송 등 정상적인 서비스를 받으실 수 없습니다. 또한 개인정보의 수집ㆍ이용 및 제공에 동의한 후에도 전화, 서면, 홈페이지 등을 통해 해당 동의를 철회할 수 있습니다. 당사 및 업무 수탁자(경품발송업체)는 개인정보보호법에 따라 고객님의 개인정보를 다음과 같이 처리하고자 합니다. 이에 동의하십니까?</p>
+            <dl>
+                <dt>개인정보의 수집ㆍ이용 목적</dt>
+                <dd>회사 홍보 이벤트 응모, 추첨 및 경품 발송</dd>
+                <dt>수집ㆍ이용하려는 개인정보의 항목</dt>
+                <dd>이름, 휴대폰 번호, 주소(주소 정보는 실물 경품 당첨자에 한함)</dd>
+                <dt>개인정보의 보유 및 이용 기간</dt>
+                <dd>수집ㆍ이용 동의일로부터 추첨 종료 시까지(단, 경품 당첨자는 경품 당첨일로부터 90일 이내)</dd>
+                <dt>개인정보의 수집ㆍ이용 및 제공받는 자</dt>
+                <dd>ABL생명 및 업무 수탁자</dd>
+            </dl>
+        </div>
+    </dd>
+</dl>
+                        <p class="policy-notice"><img src="/Images/MissionL/pop/notice_policy.png" alt="※제공한 개인정보는 경품 배송 외 활용하지 않습니다."></p>
+                    </div>
+                    <!-- //agreement_box -->
+                </div>
+                <div class="btn">
+                    <button type="submit"><img src="/Images/MissionL/pop/btn_reg_confirm.png" class="ga-event" data-action="응모완료" alt="응모 완료"></button>
+                    <div class="loading" style="display:none;"><img src="/Images/MissionL/pop/loading.gif" alt="loading"></div>
+                </div>
+            </fieldset>
+</form>    </div>
+</div>
+
+<!-- 팝업 : 미션성공 -->
+<div class="popup pop-success" id="pop-success">
+    <div class="btn-close"><a href="javascript:;" onclick="closePop('success'); return false;"><img src="/Images/MissionL/pop/btn_close_w.png" alt="닫기"></a></div>
+    <div class="pop-header">
+        <h3><img src="/Images/MissionL/pop/tl_success.png" alt="미션성공!"></h3>
+    </div>
+    <div class="pop-con">
+        <p><img src="/Images/MissionL/pop/txt_success.png" alt="확인 버튼을 눌러서 개인정보를 입력해주세요."></p>
+        <div class="btn"><a href="javascript:;" onclick="closePop('success'); openPop('entry'); return false;"><img src="/Images/MissionL/pop/btn_confirm.png" class="ga-event" data-action="미션성공-확인" alt="확인"></a></div>
+    </div>
+</div>
+
+<!-- 팝업 : 미션실패 -->
+<div class="popup pop-fail" id="pop-fail">
+    <div class="btn-close"><a href="javascript:;" onclick="closePop('fail'); return false;"><img src="/Images/MissionL/pop/btn_close_w.png" alt="닫기"></a></div>
+    <div class="pop-header">
+        <h3><img src="/Images/MissionL/pop/tl_fail.png" alt="미션실패!"></h3>
+    </div>
+    <div class="pop-con">
+        <p id="failImg"><img src="/Images/MissionL/pop/txt_fail1.jpg" alt="버튼을 눌러서 다시 도전해보세요."></p>
+        <div class="btn"><a href="javascript:;" onclick="closePop('fail'); return false;"><img src="/Images/MissionL/pop/btn_confirm_fail.png" class="ga-event" data-action="미션실패-다시도전" alt="다시 도전"></a></div>
+    </div>
+</div>
+
+<!-- 팝업 : 응모완료 -->
+<div class="popup pop-complete" id="pop-complete">
+    <div class="btn-close"><a href="javascript:;" onclick="closePop('complete'); return false;"><img src="/Images/MissionL/pop/btn_close.png" alt="닫기"></a></div>
+    <div class="pop-header">
+        <h3><img src="/Images/MissionL/pop/tl_complete.png" alt="ABL 인터넷 보험 미션L 이벤트에 응모가 완료되었습니다!"></h3>
+    </div>
+    <div class="pop-con">
+        <p><img src="/Images/MissionL/pop/txt_complete.jpg" alt="확인 버튼을 눌러서 이벤트에 다시 참여해보세요."></p>
+        <div class="btn"><a href="javascript:;" onclick="goAbl(); return false;"><img src="/Images/MissionL/pop/btn_my_insurance.png" class="ga-event" data-action="내 보험료 3초 계산" alt="내 보험료 3초 계산"></a></div>
+    </div>
+</div>
+
+
+
+    <script src="/bundles/jqueryform?v=4lvgn6QvIwzXXp8Lplx5IxUpcVbFUUvlVVI3baaawi81"></script>
+
+    <script src="/bundles/jqueryval?v=hEGG8cMxk9p0ncdRUOJ-CnKN7NezhnPnWIvn6REucZo1"></script>
+
+    <script src="/bundles/jqueryunobtrusive?v=qIO9ao4Ehj8Nh3mMbYzdqNOJxW9ADwW4EuKES2osu7k1"></script>
+
+    <script src="/bundles/commonjs?v=WXPMNT15RQ_AMs207BAYfsKpqBDeq8c0el8ZY_gZiVA1"></script>
+
+    <script src="/Scripts/bootstrap.min.js"></script>
+    
+    <script src="/Content/js/common/vue.min.js"></script>
+    <script src="/Content/js/MissionL/jquery.jSlots.js"></script>
+    <script src="/Scripts/jquery.easing.1.3.js"></script>
+    <script src="/Content/js/MissionL/pub.js"></script>
+    <script src="/Content/js/MissionL/dev.js"></script>
+    <script>
+        var googleAnalyticCategory = 'ABL 인터넷보험 - MissionL';
+    </script>
+
+</body>
+</html>
