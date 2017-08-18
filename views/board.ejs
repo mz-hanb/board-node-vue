@@ -28,8 +28,8 @@
 override method: delete, push
 
 //--- have to 
-파일첨부하기
-
+파일첨부하기( 이미지파일만 허용하기 )
+첨부한 파일( 첨부한 이미지 미리보기 )
 
 //--- 질문
 - 삭제글을 flag로 처리하는 이유( remove? drop 이아니라 )
@@ -109,7 +109,9 @@ override method: delete, push
           <input v-model="newItem.writer" type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
           <input v-model="newItem.password" type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
           <textarea v-model="newItem.contents"  class="textContents" id="addContents" name="addContents" rows="10" cols="80"></textarea>
-          <input type="file" class="inputFile" id="UploadFile" name="UploadFile">
+
+          <input type="file" multiple="multiple" class="inputFile" id="UploadFile" name="UploadFile">
+          
         </form>
         <div id="new" class="btns">
           <button v-on:click="addItemSubmit">작성완료</button>
@@ -129,7 +131,11 @@ override method: delete, push
           <p class="title-label">내용</p>                    
           <div class="detail-contents">{{ detail.contents }}</div>
         </div>
-        <div class="download-file">{{addFile}}</div>
+        <!-- <div class="download-file" v-html="addFile"> -->
+        <div class="download-file">
+          <button v-show="addFile.onAdded" type="button" v-on:click="downloadFiles"><span id="downloadFile">03</span></button>
+          <span v-show="!addFile.onAdded">첨부한 파일이 없습니다.</span>
+        </div>
         <div class="btns">
           <button v-on:click="modifyItem">수정</button>
           <!-- <button v-on:click="deleteItem">삭제</button> -->

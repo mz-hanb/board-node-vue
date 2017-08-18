@@ -2,7 +2,17 @@ var express = require('express');
 var BoardContents = require('../models/boardsSchema'); //db를 사용하기 위한 변수
 var fs = require('fs');
 var multer = require('multer'); // 파일 저장을 위한  multer
-var upload = multer({dest:'./tmp/'}); // multer 경로 설정, 파일이 업로드 되면 먼저 임시 폴더로 가서 저장됨
+var storage = multer.diskStorage({ 
+    destination: function(req, file, cb){
+        cb( null, './tmp/'); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
+    }
+    filename: function(req, file, cb){
+        cb(null, file.originalname) // cb 콜백함수를 통해 전송된 파일 이름 설정
+    }
+})
+
+// var upload = multer({dest:'./tmp/'}); // multer 경로 설정, 파일이 업로드 되면 먼저 임시 폴더로 가서 저장됨
+var upload = multer({storage: storage});
 var router = express.Router();
 var limitSize = 3;
 
@@ -49,10 +59,10 @@ router.get('/view', function(req, res){
 });
 //=== 게시글 작성
 router.post('/', upload.array('UploadFile'),function(req, res){
-    //field name은 form의 input file의 name과 같아야함
+    // field name은 form의 input file의 name과 같아야함
     // 글 작성하고 submit하게 되면 저장이 되는 부분
     // 글 수정하고 submit하면 수정된 결과가 저장되는 부분
-    var mode = req.param('mode');   
+    var mode = req.param('mode');      
 
     if(mode == 'add') {
         var addNewTitle = req.body.addContentSubject;
@@ -60,6 +70,8 @@ router.post('/', upload.array('UploadFile'),function(req, res){
         var addNewPassword = req.body.addContentPassword;
         var addNewContent = req.body.addContents;
         var upFile = req.files; // 업로드 된 파일을 받아옴
+
+        // console.dir(  req.files );    
 
         if (isSaved(upFile)) { // 파일이 제대로 업로드 되었는지 확인 후 디비에 저장시키게 됨          
             addBoard(addNewTitle, addNewWriter, addNewContent, addNewPassword, upFile);
@@ -155,6 +167,9 @@ function addBoard(title, writer, content, password, upFile){
     newBoardContents.contents = newContent;
     newBoardContents.password = password;
 
+
+    console.log( '=========== upFile>> ' + upFile.length );
+
     newBoardContents.save(function (err) {
         if (err) throw err;
         BoardContents.findOne({_id: newBoardContents._id}, {_id: 1}, function (err, newBoardId) {
@@ -231,38 +246,30 @@ function renameUploadFile(itemId,upFile){
     var rename = [];
     var fileName = [];
     var fullName = []; // 다운로드 시 보여줄 이름 필요하니까 원래 이름까지 같이 저장하자!
-    var fsName = [];   
+    var fsName = [];
 
     for (var i = 0; i < newFile.length; i++) {
-        console.log( newFile[i] );
-
         tmpPath[i] = newFile[i].path;
         tmpType[i] = newFile[i].mimetype.split('/')[1]; // 확장자 저장해주려고!
         index[i] = tmpPath[i].split('/').length;
         rename[i] = tmpPath[i].split('/')[index[i] - 1];
-        
-        // fileName [i] = itemId + "_" + getFileDate(new Date()) + "_" + rename[i] + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
-        fileName [i] = itemId + "_" + getFileDate(new Date()) + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
+        fileName [i] = itemId + "_" + getFileDate(new Date()) + "_" + rename[i] + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
         fullName [i] = fileName[i] + ":" + newFile[i].originalname.split('.')[0]; // 원래 이름까지 같이 가는 이름 "글아이디_날짜_파일명.확장자:보여줄 이름"
         fsName [i] = getDirname(1)+"upload/"+fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"
-        // fsName [i] = getDirname(1) + fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"       
-    }   
+    }
 
     renameForUpload.tmpname = tmpPath;
     renameForUpload.filename = fileName;
     renameForUpload.fullname = fullName;
-    renameForUpload.fsname = fsName;   
-
-    // console.log( '*** renameForUpload' );    
-    // console.log(  renameForUpload );
-    // console.log( '***// renameForUpload' );    
+    renameForUpload.fsname = fsName;
 
     return renameForUpload;
 }
 
 function getDirname(num){
-    // 원하는 상위폴더까지 리턴해줌. 0은 현재 위치까지, 1은 그 상위.. 이런 식으로
+    //원하는 상위폴더까지 리턴해줌. 0은 현재 위치까지, 1은 그 상위.. 이런 식으로
     // 리네임과, 파일의 경로를 따오기 위해 필요함.
+
     var order = num;
     var dirname = __dirname.split('/');
     var result = '';
@@ -273,6 +280,59 @@ function getDirname(num){
 
     return result;
 }
+
+// function renameUploadFile(itemId,upFile){
+//     // 업로드 할때 리네이밍 하는 곳!
+//     var renameForUpload = {};
+//     var newFile = upFile; // 새로 들어 온 파일
+//     var tmpPath = [];
+//     var tmpType = [];
+//     var index = [];
+//     var rename = [];
+//     var fileName = [];
+//     var fullName = []; // 다운로드 시 보여줄 이름 필요하니까 원래 이름까지 같이 저장하자!
+//     var fsName = [];   
+
+//     for (var i = 0; i < newFile.length; i++) {
+//         console.log( newFile[i] );
+
+//         tmpPath[i] = newFile[i].path;
+//         tmpType[i] = newFile[i].mimetype.split('/')[1]; // 확장자 저장해주려고!
+//         index[i] = tmpPath[i].split('/').length;
+//         rename[i] = tmpPath[i].split('/')[index[i] - 1];
+        
+//         // fileName [i] = itemId + "_" + getFileDate(new Date()) + "_" + rename[i] + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
+//         fileName [i] = itemId + "_" + getFileDate(new Date()) + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
+//         fullName [i] = fileName[i] + ":" + newFile[i].originalname.split('.')[0]; // 원래 이름까지 같이 가는 이름 "글아이디_날짜_파일명.확장자:보여줄 이름"
+//         fsName [i] = getDirname(1)+"upload/"+fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"
+//         // fsName [i] = getDirname(1) + fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"       
+//     }   
+
+//     renameForUpload.tmpname = tmpPath;
+//     renameForUpload.filename = fileName;
+//     renameForUpload.fullname = fullName;
+//     renameForUpload.fsname = fsName;   
+
+//     // console.log( '*** renameForUpload' );    
+//     // console.log(  renameForUpload );
+//     // console.log( '***// renameForUpload' );    
+
+//     return renameForUpload;
+// }
+
+// function getDirname(num){
+//     // 원하는 상위폴더까지 리턴해줌. 0은 현재 위치까지, 1은 그 상위.. 이런 식으로
+//     // 리네임과, 파일의 경로를 따오기 위해 필요함.
+//     var order = num;
+//     var dirname = __dirname.split('/');
+//     var result = '';
+
+//     for(var i=0;i<dirname.length-order;i++){
+//         result += dirname[i] + '/';
+//     }
+
+//     return result;
+// }
 
 function isSaved(upFile) {
     // 파일 저장 여부 확인해서 제대로 저장되면 디비에 저장되는 방식

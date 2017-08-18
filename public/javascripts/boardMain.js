@@ -44,6 +44,12 @@ var boardList = new Vue({
       groupLimit: 5
     },        
     detail: {},
+    addFile: {
+      onAdded: true,
+      paths: [],
+      names: []
+    },
+    onAddFile: true,
     delPw: '',
     newItem: {
       title: '',
@@ -56,16 +62,8 @@ var boardList = new Vue({
     onAddNew: false,
     onModify: false
   },
-  computed: {
-    addFile: function(){       
-      var dataFile = this.detail.fileUp;
-      if( dataFile ){        
-
-      }
-      return '';
-    }
-  },
-    methods: {   
+  computed: {},
+  methods: {   
     getPage: function(page, searchWord ) {      
       var self = this; 
       var thisPage = this.objPage;
@@ -98,7 +96,15 @@ var boardList = new Vue({
           if(item._id == self.detail._id ) item.count++;
         });
         self.initView();
-        self.onDetail = true;        
+        self.onDetail = true;   
+        
+
+        console.log( self.detail );
+
+        // self.addFile.onAdded = false;          
+        // if( self.detail.fileUp[0] ){
+        //   self.addFile.onAdded = true;
+        // } 
       })
     },
     searchItemSubmit: function(){
@@ -214,7 +220,14 @@ var boardList = new Vue({
       if( endNum > this.objPage.total ) endNum = this.objPage.total;
 
       thisPage.listCurrent = thisPage.list.slice(startNum, endNum); 
-    }  
+    },
+    downloadFiles: function(){
+      console.log( 'fn:: downloadFiles '  );
+      // var path = filepath;
+        // if (confirm("파일이 다운로드 됩니다.") == true) {
+        //   location.href = "/boards-api/download/" +filePath;          
+        // }
+    }    
   }
 })
 
