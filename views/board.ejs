@@ -26,9 +26,9 @@
 페이징,
 비밀번호 맞는지여부,
 override method: delete, push
+파일첨부하기( 이미지파일만 허용하기 )
 
 //--- have to 
-파일첨부하기( 이미지파일만 허용하기 )
 첨부한 파일( 첨부한 이미지 미리보기 )
 
 //--- 질문
@@ -110,7 +110,7 @@ override method: delete, push
           <input v-model="newItem.password" type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
           <textarea v-model="newItem.contents"  class="textContents" id="addContents" name="addContents" rows="10" cols="80"></textarea>
 
-          <input type="file" multiple="multiple" class="inputFile" id="UploadFile" name="UploadFile">
+          <input type="file" class="inputFile" id="UploadFile" name="UploadFile" multiple accept='image/*'>
           
         </form>
         <div id="new" class="btns">
@@ -133,7 +133,9 @@ override method: delete, push
         </div>
         <!-- <div class="download-file" v-html="addFile"> -->
         <div class="download-file">
-          <button v-show="addFile.onAdded" type="button" v-on:click="downloadFiles"><span id="downloadFile">03</span></button>
+          <ul v-show="addFile.onAdded" >
+            <li v-for="file in loadedList"><a v-bind:href="file.filePath" v-bind:download="file.filename"><img v-bind:src="file.thumbUrl" alt=""></a></li>
+          </ul>          
           <span v-show="!addFile.onAdded">첨부한 파일이 없습니다.</span>
         </div>
         <div class="btns">
@@ -177,12 +179,14 @@ override method: delete, push
     
   </div>
 
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
 
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
     crossorigin="anonymous"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+  
 
   <script src="/javascripts/moment.js"></script>
   <script src="https://unpkg.com/vue"></script>

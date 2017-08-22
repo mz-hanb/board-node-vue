@@ -16,8 +16,6 @@ if (fileUp != "") {
   output = "파일이 없습니다.";
 }
 $('.download-file').html(output);
-
-
 */
 
 // if (page == null) { // 메인화면에서는 page 쿼리가 없으므로 빈값일 때
@@ -44,6 +42,7 @@ var boardList = new Vue({
       groupLimit: 5
     },        
     detail: {},
+    loadedList: [],
     addFile: {
       onAdded: true,
       paths: [],
@@ -72,7 +71,7 @@ var boardList = new Vue({
 
       $.get('/boards-api/get-list?page=' + page + '&searchWord='+searchWord, function(data, status) {
         self.items = data.contents;            
-        thisPage.total = data.pagination;
+        thisPage.total = data.pagination;        
         
         for( var i = 0; i < thisPage.total; i++){
           // 전체리스트
@@ -97,15 +96,24 @@ var boardList = new Vue({
         });
         self.initView();
         self.onDetail = true;   
-        
 
-        console.log( self.detail );
-
-        // self.addFile.onAdded = false;          
-        // if( self.detail.fileUp[0] ){
-        //   self.addFile.onAdded = true;
-        // } 
+        console.log( '//////////////// detail' );
+        console.dir( self.detail );
+        if( data.content.fileUp ){
+          self.addFile.onAdded = true;          
+          self.setLoadedFile(data.content.fileUp);
+        }else{
+          self.addFile.onAdded = false;          
+        }
       })
+    },
+    setLoadedFile: function(list){
+      this.loadedList = [];              
+      for( var i = 0; i < list.length; i++ ){
+        var temp = list[i].split('#');
+        var obj = {'filename': temp[0], 'filePath': temp[1], 'thumbUrl': temp[2]};
+        this.loadedList.push(obj);
+      }
     },
     searchItemSubmit: function(){
       console.log( this.searchWord );      
@@ -125,7 +133,7 @@ var boardList = new Vue({
       var formData = new FormData(form);
       $.ajax({
         type: 'POST',
-        url: '/boards-api?mode=add',
+        url: '/boards-api',
         processData: false,
         contentType: false,
         data: formData,
@@ -220,25 +228,9 @@ var boardList = new Vue({
       if( endNum > this.objPage.total ) endNum = this.objPage.total;
 
       thisPage.listCurrent = thisPage.list.slice(startNum, endNum); 
-    },
-    downloadFiles: function(){
-      console.log( 'fn:: downloadFiles '  );
-      // var path = filepath;
-        // if (confirm("파일이 다운로드 됩니다.") == true) {
-        //   location.href = "/boards-api/download/" +filePath;          
-        // }
     }    
   }
 })
 
 boardList.getPage();
-
-// function downloadFiles(filepath) {
-//   var path = filepath;
-//   if (confirm("파일이 다운로드 됩니다.") == true) {
-//     // location.href = "/boards/download/" + path;
-//     // getList();
-//   }
-// }
-
 // }());

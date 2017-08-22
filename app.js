@@ -14,8 +14,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-
-
+//--- db col
 mongoose.connect('mongodb://localhost/boards');
 
 var db = mongoose.connection;
@@ -27,6 +26,7 @@ db.once('open', function() {
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
+app.use('/uploads', express.static('uploads')); // 업로드한 이미지 접근경로
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public

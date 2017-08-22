@@ -1,13 +1,16 @@
 var express = require('express');
 var BoardContents = require('../models/boardsSchema'); //db를 사용하기 위한 변수
 var fs = require('fs');
+var path = require('path');
+var gm = require('gm');
 var multer = require('multer'); // 파일 저장을 위한  multer
 var storage = multer.diskStorage({ 
     destination: function(req, file, cb){
-        cb( null, './tmp/'); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
-    }
+        cb( null, 'uploads/'); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
+    },
     filename: function(req, file, cb){
-        cb(null, file.originalname) // cb 콜백함수를 통해 전송된 파일 이름 설정
+        var objFile = path.parse(file.originalname);
+        cb(null, objFile.name + '-' + new Date().valueOf() + objFile.ext ) // cb 콜백함수를 통해 전송된 파일 이름 설정
     }
 })
 
@@ -47,7 +50,7 @@ router.get('/view', function(req, res){
     BoardContents.findOne({_id:contentId}, function(err, rawContent){
         if(err) throw err;
         rawContent.count += 1;
-        console.log('//'+ rawContent.count );
+        // console.log('//'+ rawContent.count );
         var reply_pg = Math.ceil(rawContent.comments.length/5);
         //----
         rawContent.save(function(err){
@@ -62,24 +65,33 @@ router.post('/', upload.array('UploadFile'),function(req, res){
     // field name은 form의 input file의 name과 같아야함
     // 글 작성하고 submit하게 되면 저장이 되는 부분
     // 글 수정하고 submit하면 수정된 결과가 저장되는 부분
-    var mode = req.param('mode');      
+    var mode = req.param('mode');    
+    
+    var addNewTitle = req.body.addContentSubject;
+    var addNewWriter = req.body.addContentWriter;
+    var addNewPassword = req.body.addContentPassword;
+    var addNewContent = req.body.addContents;
+    var upFile = req.files; // 업로드 된 파일을 받아옴    
 
-    if(mode == 'add') {
-        var addNewTitle = req.body.addContentSubject;
-        var addNewWriter = req.body.addContentWriter;
-        var addNewPassword = req.body.addContentPassword;
-        var addNewContent = req.body.addContents;
-        var upFile = req.files; // 업로드 된 파일을 받아옴
-
-        // console.dir(  req.files );    
-
-        if (isSaved(upFile)) { // 파일이 제대로 업로드 되었는지 확인 후 디비에 저장시키게 됨          
-            addBoard(addNewTitle, addNewWriter, addNewContent, addNewPassword, upFile);
-            res.send();
-        } else {
-          console.log("파일이 저장되지 않았습니다!");
-        }
-    }
+    upFile.forEach(function(file, idx){
+        console.dir(file);
+        var width = 100;
+        var height = 100;
+        var objFile = path.parse(file.filename)
+        var stPath = 'uploads/thumbnails/'+ objFile.name + '-' + Date.now().valueOf() + objFile.ext;
+        gm(file.path)
+        .resize(width, height)
+        .noProfile()
+        .write(stPath , function(err){        
+            if(err){
+                console.error(err);
+            }
+            file.thumbUrl = stPath;
+        })        
+    });    
+    // console.dir(  req.files );    
+    addBoard(addNewTitle, addNewWriter, addNewContent, addNewPassword, upFile );
+    res.send();
 });
 //=== 게시글 수정
 router.put('/', function(req, res){
@@ -100,18 +112,14 @@ router.put('/', function(req, res){
 //=== 게시글 삭제
 router.delete('/', function(req, res){
     var contentId = req.param('id');
-    var delPw = req.param('pw');    
-
-    console.log( 'del>>>>> ' + delPw );
+    var delPw = req.param('pw');        
     checkPassword( contentId, delPw, function(isMatch){
         if( isMatch ){        
-            console.log( '/// match ////' + isMatch );
             BoardContents.update({_id:contentId}, {$set:{deleted:true}}, function(err){
                 if(err) throw err;        
                 res.send();        
             });
-        }else{
-            console.log( '/// unMatch /// ' + isMatch );
+        }else{            
             res.setHeader('Content-Type', 'application/json');
             res.send({error: 'not match password'});
         }    
@@ -159,6 +167,7 @@ module.exports = router;
 
 //=== 게시글 추가
 function addBoard(title, writer, content, password, upFile){
+
     var newContent = content.replace(/\r\n/gi, "\\r\\n");
 
     var newBoardContents = new BoardContents;
@@ -169,6 +178,7 @@ function addBoard(title, writer, content, password, upFile){
 
 
     console.log( '=========== upFile>> ' + upFile.length );
+    // console.log( '=========== upFile>> ' + upFile.length );
 
     newBoardContents.save(function (err) {
         if (err) throw err;
@@ -176,19 +186,22 @@ function addBoard(title, writer, content, password, upFile){
             if (err) throw err;
 
             if (upFile != null) {
-                var renaming = renameUploadFile(newBoardId.id, upFile);
+                // var renaming = renameUploadFile(newBoardId.id, upFile);
+
+                // for (var i = 0; i < upFile.length; i++) {
+                //     fs.rename(renaming.tmpname[i], renaming.fsname[i], function (err) {
+                //         if (err) {
+                //             console.log(err);
+                //             return;
+                //         }
+                //     });
+                // }
 
                 for (var i = 0; i < upFile.length; i++) {
-                    fs.rename(renaming.tmpname[i], renaming.fsname[i], function (err) {
-                        if (err) {
-                            console.log(err);
-                            return;
-                        }
-                    });
-                }
-
-                for (var i = 0; i < upFile.length; i++) {
-                    BoardContents.update({_id: newBoardId.id}, {$push: {fileUp: renaming.fullname[i]}}, function (err) {
+                    // BoardContents.update({_id: newBoardId.id}, {$push: {fileUp: renaming.fullname[i] }}, function (err) {
+                    console.dir( upFile[i]);
+                    var objFile = upFile[i];
+                    BoardContents.update({_id: newBoardId.id}, {$push: {fileUp: objFile.filename + '#' + objFile.path + '#' + objFile.thumbUrl }}, function (err) {
                         if (err) throw err;
                     });
                 }
@@ -223,6 +236,8 @@ function addComment(id, writer, comment) {
         });
     });
 }
+
+/*
 function getFileDate(date) {
     var year = date.getFullYear();
     var month = date.getMonth()+1;
@@ -232,10 +247,10 @@ function getFileDate(date) {
     var sec = date.getSeconds();
 
     var fullDate = year+""+month+""+day+""+hour+""+min+""+sec;
-
     return fullDate
 }
-
+*/
+/*
 function renameUploadFile(itemId,upFile){
     // 업로드 할때 리네이밍 하는 곳!
     var renameForUpload = {};
@@ -265,7 +280,8 @@ function renameUploadFile(itemId,upFile){
 
     return renameForUpload;
 }
-
+*/
+/*
 function getDirname(num){
     //원하는 상위폴더까지 리턴해줌. 0은 현재 위치까지, 1은 그 상위.. 이런 식으로
     // 리네임과, 파일의 경로를 따오기 위해 필요함.
@@ -280,6 +296,7 @@ function getDirname(num){
 
     return result;
 }
+*/
 
 // function renameUploadFile(itemId,upFile){
 //     // 업로드 할때 리네이밍 하는 곳!
