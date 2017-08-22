@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var sassMiddleware = require('node-sass-middleware');
 var mongoose = require('mongoose');
+var methodOverride = require('method-override');
 
 var boards = require('./routes/boards');
 var boardsApi = require('./routes/boards-api');
@@ -13,8 +14,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
-
-
+//--- db col
 mongoose.connect('mongodb://localhost/boards');
 
 var db = mongoose.connection;
@@ -26,6 +26,7 @@ db.once('open', function() {
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
+app.use('/uploads', express.static('uploads')); // 업로드한 이미지 접근경로
 app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
@@ -35,14 +36,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-
 app.use(sassMiddleware({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public'),
   indentedSyntax: false, // true = .sass and false = .scss
   sourceMap: true
 }));
-
+// override with the X-HTTP-Method-Override header in the request 
+// app.use(methodOverride('X-HTTP-Method-Override'));
+app.use(methodOverride('_method'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 

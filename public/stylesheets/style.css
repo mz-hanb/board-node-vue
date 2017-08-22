@@ -16,8 +16,38 @@
   overflow: hidden;
   border-radius: 7px; }
 
-.btns {
-  float: right; }
+.board-list table {
+  margin: 0; }
+
+.board-list hr {
+  margin: 0; }
+
+.board-list .pagination-wrap {
+  text-align: center; }
+
+.board-list .btns {
+  margin-top: 20px;
+  text-align: right; }
+  .board-list .btns > * {
+    display: inline-block; }
+
+.board-detail .title-label {
+  display: inline-block;
+  width: 55px; }
+
+.board-detail .content-text {
+  margin-top: 20px; }
+  .board-detail .content-text .detail-contents {
+    padding: 3px;
+    height: 100px;
+    border: 1px solid #ddd; }
+
+.board-detail .btns {
+  margin: 5px 0;
+  text-align: right; }
+
+.board-detail .delete_confirm {
+  text-align: right; }
 
 .write_form textarea {
   width: 100%; }
