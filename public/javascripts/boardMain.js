@@ -1,29 +1,3 @@
-// $(function(){
-/*
-var fileUp = '{{ detail.fileUp }}';
-var files = '';
-var cnt = '';
-var output = '';
-if (fileUp != "") {
-  files = fileUp.split(',');
-  cnt = files.length;
-  for (var i = 0; i < cnt; i++) {
-    output += "<button type='button' onclick=downloadFiles('" + files[i].split(':')[0] + "');>";
-    output += "<span id='downloadFile'>" + files[i].split(':')[1] + "</span>";
-    output += "</button>";
-  }
-} else {
-  output = "파일이 없습니다.";
-}
-$('.download-file').html(output);
-*/
-
-// if (page == null) { // 메인화면에서는 page 쿼리가 없으므로 빈값일 때
-//   $(".pagination a:eq(0)").attr('class', 'current-page');
-// }
-
-// $(".pagination a:eq(" + index + ")").attr('class', 'current-page');
-
 /***********************************************
  * vue
  * *********************************************/
@@ -44,9 +18,7 @@ var boardList = new Vue({
     detail: {},
     loadedList: [],
     addFile: {
-      onAdded: true,
-      paths: [],
-      names: []
+      onAdded: true      
     },
     onAddFile: true,
     delPw: '',
@@ -97,9 +69,8 @@ var boardList = new Vue({
         self.initView();
         self.onDetail = true;   
 
-        console.log( '//////////////// detail' );
-        console.dir( self.detail );
-        if( data.content.fileUp ){
+        // console.dir( self.detail );
+        if( data.content.fileUp.length > 0 ){
           self.addFile.onAdded = true;          
           self.setLoadedFile(data.content.fileUp);
         }else{
