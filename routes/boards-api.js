@@ -62,36 +62,22 @@ router.get('/view', function(req, res){
 });
 //=== 게시글 작성
 router.post('/', upload.array('UploadFile'),function(req, res){
-    // field name은 form의 input file의 name과 같아야함
-    // 글 작성하고 submit하게 되면 저장이 되는 부분
-    // 글 수정하고 submit하면 수정된 결과가 저장되는 부분
-    var mode = req.param('mode');    
-    
+    // field name은 form의 input file의 name과 같아야함    
     var addNewTitle = req.body.addContentSubject;
     var addNewWriter = req.body.addContentWriter;
     var addNewPassword = req.body.addContentPassword;
     var addNewContent = req.body.addContents;
-    var upFile = req.files; // 업로드 된 파일을 받아옴    
-
-    upFile.forEach(function(file, idx){
-        console.dir(file);
-        var width = 100;
-        var height = 100;
-        var objFile = path.parse(file.filename)
-        var stPath = 'uploads/thumbnails/'+ objFile.name + '-' + Date.now().valueOf() + objFile.ext;
-        gm(file.path)
-        .resize(width, height)
-        .noProfile()
-        .write(stPath , function(err){        
-            if(err){
-                console.error(err);
-            }
-            file.thumbUrl = stPath;
-        })        
-    });    
-    // console.dir(  req.files );    
-    addBoard(addNewTitle, addNewWriter, addNewContent, addNewPassword, upFile );
-    res.send();
+    var upFile = req.files; // 업로드 된 파일을 받아옴        
+    
+    if( upFile.length > 0 ){
+        makeThumbnails(upFile, function(){            
+            addBoard(addNewTitle, addNewWriter, addNewContent, addNewPassword, upFile );
+            res.send();
+        });
+    }else{
+        addBoard(addNewTitle, addNewWriter, addNewContent, addNewPassword, upFile );
+        res.send();
+    }          
 });
 //=== 게시글 수정
 router.put('/', function(req, res){
@@ -170,12 +156,13 @@ function addBoard(title, writer, content, password, upFile){
 
     var newContent = content.replace(/\r\n/gi, "\\r\\n");
 
+    console.log(  'fn:addBoard> upFile> ' + upFile  );
+
     var newBoardContents = new BoardContents;
     newBoardContents.writer = writer;
     newBoardContents.title = title;
     newBoardContents.contents = newContent;
     newBoardContents.password = password;
-
 
     console.log( '=========== upFile>> ' + upFile.length );
     // console.log( '=========== upFile>> ' + upFile.length );
@@ -185,21 +172,9 @@ function addBoard(title, writer, content, password, upFile){
         BoardContents.findOne({_id: newBoardContents._id}, {_id: 1}, function (err, newBoardId) {
             if (err) throw err;
 
-            if (upFile != null) {
-                // var renaming = renameUploadFile(newBoardId.id, upFile);
-
-                // for (var i = 0; i < upFile.length; i++) {
-                //     fs.rename(renaming.tmpname[i], renaming.fsname[i], function (err) {
-                //         if (err) {
-                //             console.log(err);
-                //             return;
-                //         }
-                //     });
-                // }
-
-                for (var i = 0; i < upFile.length; i++) {
-                    // BoardContents.update({_id: newBoardId.id}, {$push: {fileUp: renaming.fullname[i] }}, function (err) {
-                    console.dir( upFile[i]);
+            if (upFile != null) {               
+                for (var i = 0; i < upFile.length; i++) {                    
+                    // console.dir( upFile[i]);
                     var objFile = upFile[i];
                     BoardContents.update({_id: newBoardId.id}, {$push: {fileUp: objFile.filename + '#' + objFile.path + '#' + objFile.thumbUrl }}, function (err) {
                         if (err) throw err;
@@ -237,123 +212,47 @@ function addComment(id, writer, comment) {
     });
 }
 
-/*
-function getFileDate(date) {
-    var year = date.getFullYear();
-    var month = date.getMonth()+1;
-    var day = date.getDate();
-    var hour = date.getHours();
-    var min = date.getMinutes();
-    var sec = date.getSeconds();
-
-    var fullDate = year+""+month+""+day+""+hour+""+min+""+sec;
-    return fullDate
+// check password
+function checkPassword(id, pw, callback){        
+    // isMatch = false;    
+    BoardContents.findOne({_id: id}, function(err, rawContents){                
+        var isMatch = false;
+        if( rawContents.password === pw ){
+            isMatch = true;
+        }else{
+            isMatch = false;           
+        }
+        callback( isMatch );        
+    });
 }
-*/
-/*
-function renameUploadFile(itemId,upFile){
-    // 업로드 할때 리네이밍 하는 곳!
-    var renameForUpload = {};
-    var newFile = upFile; // 새로 들어 온 파일
-    var tmpPath = [];
-    var tmpType = [];
-    var index = [];
-    var rename = [];
-    var fileName = [];
-    var fullName = []; // 다운로드 시 보여줄 이름 필요하니까 원래 이름까지 같이 저장하자!
-    var fsName = [];
 
-    for (var i = 0; i < newFile.length; i++) {
-        tmpPath[i] = newFile[i].path;
-        tmpType[i] = newFile[i].mimetype.split('/')[1]; // 확장자 저장해주려고!
-        index[i] = tmpPath[i].split('/').length;
-        rename[i] = tmpPath[i].split('/')[index[i] - 1];
-        fileName [i] = itemId + "_" + getFileDate(new Date()) + "_" + rename[i] + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
-        fullName [i] = fileName[i] + ":" + newFile[i].originalname.split('.')[0]; // 원래 이름까지 같이 가는 이름 "글아이디_날짜_파일명.확장자:보여줄 이름"
-        fsName [i] = getDirname(1)+"upload/"+fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"
-    }
-
-    renameForUpload.tmpname = tmpPath;
-    renameForUpload.filename = fileName;
-    renameForUpload.fullname = fullName;
-    renameForUpload.fsname = fsName;
-
-    return renameForUpload;
+function makeThumbnails(fileDataList, cb){
+    var cnt = 0;
+    fileDataList.forEach(function(file, idx){
+        console.dir(file);
+        var width = 100;
+        var height = 100;
+        var objFile = path.parse(file.filename)
+        var stPath = 'uploads/thumbnails/'+ objFile.name + '-' + Date.now().valueOf() + objFile.ext;
+        gm(file.path)
+        .resize(width, height)
+        .noProfile()
+        .write(stPath , function(err){        
+            if(err){
+                console.error(err);
+            }
+            file.thumbUrl = stPath;
+            cnt++;               
+            if( cnt === fileDataList.length ){
+                cb();
+            } 
+        })        
+    });  
 }
-*/
-/*
-function getDirname(num){
-    //원하는 상위폴더까지 리턴해줌. 0은 현재 위치까지, 1은 그 상위.. 이런 식으로
-    // 리네임과, 파일의 경로를 따오기 위해 필요함.
 
-    var order = num;
-    var dirname = __dirname.split('/');
-    var result = '';
-
-    for(var i=0;i<dirname.length-order;i++){
-        result += dirname[i] + '/';
-    }
-
-    return result;
-}
-*/
-
-// function renameUploadFile(itemId,upFile){
-//     // 업로드 할때 리네이밍 하는 곳!
-//     var renameForUpload = {};
-//     var newFile = upFile; // 새로 들어 온 파일
-//     var tmpPath = [];
-//     var tmpType = [];
-//     var index = [];
-//     var rename = [];
-//     var fileName = [];
-//     var fullName = []; // 다운로드 시 보여줄 이름 필요하니까 원래 이름까지 같이 저장하자!
-//     var fsName = [];   
-
-//     for (var i = 0; i < newFile.length; i++) {
-//         console.log( newFile[i] );
-
-//         tmpPath[i] = newFile[i].path;
-//         tmpType[i] = newFile[i].mimetype.split('/')[1]; // 확장자 저장해주려고!
-//         index[i] = tmpPath[i].split('/').length;
-//         rename[i] = tmpPath[i].split('/')[index[i] - 1];
-        
-//         // fileName [i] = itemId + "_" + getFileDate(new Date()) + "_" + rename[i] + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
-//         fileName [i] = itemId + "_" + getFileDate(new Date()) + "." + tmpType[i]; // 파일 확장자 명까지 같이 가는 이름 "글아이디_날짜_파일명.확장자"
-//         fullName [i] = fileName[i] + ":" + newFile[i].originalname.split('.')[0]; // 원래 이름까지 같이 가는 이름 "글아이디_날짜_파일명.확장자:보여줄 이름"
-//         fsName [i] = getDirname(1)+"upload/"+fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"
-//         // fsName [i] = getDirname(1) + fileName[i]; // fs.rename 용 이름 "./upload/글아이디_날짜_파일명.확장자"       
-//     }   
-
-//     renameForUpload.tmpname = tmpPath;
-//     renameForUpload.filename = fileName;
-//     renameForUpload.fullname = fullName;
-//     renameForUpload.fsname = fsName;   
-
-//     // console.log( '*** renameForUpload' );    
-//     // console.log(  renameForUpload );
-//     // console.log( '***// renameForUpload' );    
-
-//     return renameForUpload;
-// }
-
-// function getDirname(num){
-//     // 원하는 상위폴더까지 리턴해줌. 0은 현재 위치까지, 1은 그 상위.. 이런 식으로
-//     // 리네임과, 파일의 경로를 따오기 위해 필요함.
-//     var order = num;
-//     var dirname = __dirname.split('/');
-//     var result = '';
-
-//     for(var i=0;i<dirname.length-order;i++){
-//         result += dirname[i] + '/';
-//     }
-
-//     return result;
-// }
-
+/* 미사용: 정리에정
 function isSaved(upFile) {
     // 파일 저장 여부 확인해서 제대로 저장되면 디비에 저장되는 방식
-
     var savedFile = upFile;
     var count = 0;
 
@@ -373,18 +272,4 @@ function isSaved(upFile) {
         return true;
     }
 }
-
-
-// check password
-function checkPassword(id, pw, callback){        
-    // isMatch = false;    
-    BoardContents.findOne({_id: id}, function(err, rawContents){                
-        var isMatch = false;
-        if( rawContents.password === pw ){
-            isMatch = true;
-        }else{
-            isMatch = false;           
-        }
-        callback( isMatch );        
-    });
-}
+*/

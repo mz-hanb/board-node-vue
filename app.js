@@ -45,7 +45,6 @@ app.use(sassMiddleware({
 // override with the X-HTTP-Method-Override header in the request 
 // app.use(methodOverride('X-HTTP-Method-Override'));
 app.use(methodOverride('_method'));
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);

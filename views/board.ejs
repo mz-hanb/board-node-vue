@@ -18,24 +18,21 @@
 <!--
 
 //--- done
-게시판 리스트 보기,
-검색하기,
-쓰기,
-수정하기,
-삭제하기,
-페이징,
-비밀번호 맞는지여부,
+게시판 리스트 보기: vue
+검색하기: http protocol
+  요청/응답(request/response)
+쓰기
+수정하기
+삭제하기: module method-override 사용
+페이징
+비밀번호 맞는지여부
 override method: delete, push
 파일첨부하기( 이미지파일만 허용하기 )
-
-//--- have to 
 첨부한 파일( 첨부한 이미지 미리보기 )
 
 //--- 질문
 - 삭제글을 flag로 처리하는 이유( remove? drop 이아니라 )
 - 서버쪽에서 에러가 났을때 frontend 단으로 전송하는 방식: error 처리
-
-
 -->
 
 <body>
@@ -57,8 +54,7 @@ override method: delete, push
           <td class="number">
             {{ idx }}
           </td>
-          <td class="title">
-            <!-- <a v-bind:href="'/boards/view?id='+ item._id"  > -->
+          <td class="title">            
             <a v-on:click="showDetail(item._id)">
                   {{ item.title }}
                 </a>
@@ -133,10 +129,15 @@ override method: delete, push
         </div>
         <!-- <div class="download-file" v-html="addFile"> -->
         <div class="download-file">
-          <ul v-show="addFile.onAdded" >
-            <li v-for="file in loadedList"><a v-bind:href="file.filePath" v-bind:download="file.filename"><img v-bind:src="file.thumbUrl" alt=""></a></li>
+          <p>첨부한 이미지</p>
+          <hr>
+          <ul class="add-files" v-show="addFile.onAdded" >
+            <li v-for="file in loadedList">
+              <a v-bind:href="file.filePath" v-bind:download="file.filename"><img v-bind:src="file.thumbUrl" alt=""><span>{{file.filename}}</span></a>
+            </li>
           </ul>          
-          <span v-show="!addFile.onAdded">첨부한 파일이 없습니다.</span>
+          <p v-show="!addFile.onAdded">첨부한 파일이 없습니다.</p>
+          <!-- <p v-show="!addFile.onAdded">첨부한 파일을 불러올 수 없습니다.</p> -->
         </div>
         <div class="btns">
           <button v-on:click="modifyItem">수정</button>
