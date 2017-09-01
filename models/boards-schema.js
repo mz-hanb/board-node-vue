@@ -11,11 +11,14 @@ var boardSchema = mongoose.Schema({
         memo: String,
         date: {type: Date, default: Date.now}
     }],
-    count: {type:Number, default: 0},
+    count: {type: Number, default: 0},
     date: {type: Date, default: Date.now},
-    updated: [{title: String, contents: String, date:{type: Date, default: Date.now}}],
+    updated: [{title: String, contents: String, date: {type: Date, default: Date.now}}],
     deleted: {type: Boolean, default: false}, // true면 삭제 된 경우임
-    fileUp:[String] // 업로드 된 파일 저장된 주소
+    // fileUp:[String] // 업로드 된 파일 저장된 주소
+    fileUp: [
+        {fileName: String, fileOriginPath: String, fileThumbPath: String, exist: Boolean}
+    ] // 업로드 된 파일 저장된 주소    
 });
 
-module.exports =  mongoose.model('BoardContents', boardSchema);
+module.exports = mongoose.model('BoardContents', boardSchema);

@@ -31,12 +31,13 @@ override method: delete, push
 첨부한 파일( 첨부한 이미지 미리보기 )
 
 //--- 질문
-- 삭제글을 flag로 처리하는 이유( remove? drop 이아니라 )
-- 서버쪽에서 에러가 났을때 frontend 단으로 전송하는 방식: error 처리
--->
+- 삭제글을 flag로 처리하는 이유( remove? drop 이아니라 ): case by case
 
+- 서버쪽에서 에러가 났을때 frontend 단으로 전송하는 방식: error 처리
+  client ajax( erro, error, complete callback )
+-->
 <body>
-  <div id="v-board" class="v-board">
+  <div id="v-board" class="v-board" v-cloak >
     <!-- list -->
     <div class="board-list">
       <a href="/boards">
@@ -52,9 +53,9 @@ override method: delete, push
         </tr>
         <tr v-for="(item, idx) in items">
           <td class="number">
-            {{ idx }}
+            {{ getListNum(idx) }}
           </td>
-          <td class="title">            
+          <td class="title">
             <a v-on:click="showDetail(item._id)">
                   {{ item.title }}
                 </a>
@@ -73,26 +74,26 @@ override method: delete, push
       <hr>
       <div class="btns">
           <form action="/boards/search" method="get" id="action-search" name="action-search">
-            <input v-model="searchWord" type="text" class="search_word" id="searchWord" name="searchWord">        
+            <input v-model="searchWord" type="text" class="search_word" id="searchWord" name="searchWord">
             <button type="button" v-on:click="searchItemSubmit">검색</button>
           </form>
         <button v-on:click="showAddNew()">새 글</button>
-      </div>      
+      </div>
       <nav class="pagination-wrap" aria-label="Page navigation">
         <ul class="pagination">
           <li class="btn-prev-pagegroup">
             <a v-on:click="goPrevPageGroup" href="#" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a>
-          </li>          
-          <li v-for="(pageItem, idx) in objPage.listCurrent" ><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>          
+          </li>
+          <li v-for="(pageItem, idx) in objPage.listCurrent" ><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>
           <li class="btn-next-pagegroup">
             <a v-on:click="goNextPageGroup" href="#" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
         </ul>
-      </nav>      
+      </nav>
     </div>
     <!--// list -->
 
@@ -101,18 +102,35 @@ override method: delete, push
         <h3>게시글 작성하기</h3>
         <form id="write-action" action="/boards?mode=add" method="post" enctype="multipart/form-data">
           <!-- <form id="writeAction" action="/boards/loadFile" method="post" enctype="multipart/form-data"> -->
-          <input v-model="newItem.title" type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
-          <input v-model="newItem.writer" type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
-          <input v-model="newItem.password" type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
-          <textarea v-model="newItem.contents"  class="textContents" id="addContents" name="addContents" rows="10" cols="80"></textarea>
+          <div class="content-title">
+            <label class="title-label">제목</label>
+            <input v-model="newItem.title" type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
+          </div>
+          <div class="content-title">
+              <label class="title-label">작성자</label>
+              <input v-model="newItem.writer" type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
+            </div>
+            <div class="content-title">
+                <label class="title-label">비밀번호</label>
+                <input v-model="newItem.password" type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
+              </div>
 
-          <input type="file" class="inputFile" id="UploadFile" name="UploadFile" multiple accept='image/*'>
-          
-        </form>
+              <div class="content-text">
+                  <p class="title-label">내용</p>
+                  <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
+                  <textarea v-model="newItem.contents"  class="textContents" id="addContents" name="addContents"></textarea>
+                </div>
+                <div>
+                    <p>파일 첨부하기</p>
+                    <input type="file" class="inputFile" id="UploadFile" name="UploadFile" multiple accept='image/*'>
+                </div>
+                      </form>
+
         <div id="new" class="btns">
           <button v-on:click="addItemSubmit">작성완료</button>
           <button v-on:click="addItemCancle">작성취소</button>
         </div>
+        <button class="btn-close-self" @click="onAddNew=false">X</button>
       </div>
       <!--// new content write form: 새글 쓰기 UI -->
 
@@ -122,75 +140,58 @@ override method: delete, push
         <div class="content-title"><span class="title-label">제목</span>: {{ detail.title }}</div>
         <div class="content-info"><span class="title-label">작성일</span>: {{ formateDate( detail.date) }}</div>
         <div class="detail-writer"><span class="title-label">작성자</span>: {{ detail.writer }}</div>
-        
+
         <div class="content-text">
-          <p class="title-label">내용</p>                    
-          <div class="detail-contents">{{ detail.contents }}</div>
+          <p class="title-label">내용</p>
+          <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
+          <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" v-bind:readonly="!onModify">{{ detail.contents }}</textarea>
         </div>
         <!-- <div class="download-file" v-html="addFile"> -->
-        <div class="download-file">
+        <div class="download-file" v-show="addFile.onAdded">
           <p>첨부한 이미지</p>
           <hr>
-          <ul class="add-files" v-show="addFile.onAdded" >
+          <ul class="add-files">
             <li v-for="file in loadedList">
-              <a v-bind:href="file.filePath" v-bind:download="file.filename"><img v-bind:src="file.thumbUrl" alt=""><span>{{file.filename}}</span></a>
+              <a v-bind:href="file.fileOriginPath" v-bind:download="file.fileName"><img v-bind:src="file.fileThumbPath" alt=""><span>{{file.fileName}}</span></a>              
+              <button v-show="onModify" onclick="$(this).parent().hide()">X</button>
             </li>
-          </ul>          
+          </ul>
           <p v-show="!addFile.onAdded">첨부한 파일이 없습니다.</p>
           <!-- <p v-show="!addFile.onAdded">첨부한 파일을 불러올 수 없습니다.</p> -->
         </div>
         <div class="btns">
-          <button v-on:click="modifyItem">수정</button>
+          <button v-show="!onModify" @click="modifyItem">수정</button>
+          
+          <input v-show="onModify" v-model="delPw" type="password" id="delPassword" name="delPassword">
+          <button v-show="onModify" @click="modifyItem">수정완료</button>
+          <button v-show="onModify" @click="modifyItem">취소</button>          
           <!-- <button v-on:click="deleteItem">삭제</button> -->
-          <!-- <button href="/boards">확인</button> -->
           <div class="clear"></div>
         </div>
         <div class="clear"></div>
         <!-- delete confirm window -->
         <div class="delete_confirm">
-              <span>비밀 번호를 입력하면 글이 삭제됩니다.</span><br>
+              <span>비밀 번호를 입력하고 글이 삭제됩니다.</span><br>
               <input v-model="delPw" type="password" id="delPassword" name="delPassword">
               <button v-on:click="deleteItem">삭제</button>
-              <button v-on:click="deleteItemCancle">취소</button>            
+              <button v-on:click="deleteItemCancle">취소</button>
         </div>
+        <button class="btn-close-self" @click="onDetail=false">X</button>
         <!-- end -->
         <div class="clear"></div>
       </div>
-      <!--// board detail -->
-
-      <!-- modify -->
-      <div v-show="onModify" id="" class="modify_form board-section">
-        <h3>게시글 수정하기</h3>
-        <form id="modify-action" action="/boards/?mode=modify" method="post">
-          <!-- 경로 설정 /: 이거 뭔가 해야징-->
-          <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
-          <input type="password" class="inputPassword" id="modContentPassword" name="modContentPassword" placeholder="비밀번호">
-          <span class="modWriter" id="modContentWriter" name="modContentWriter">작성자: {{detail.writer}}</span>
-          <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" rows="5" cols="80"></textarea>
-
-          <!-- <input type="hidden" id="modId" name="modId" value="<%=contents._id%>"> -->
-          <input type="hidden" id="modId" name="modId" v-bind:value="detail._id">
-        </form>
-        <div class="btns">
-          <button v-on:click="modifyItemComp">수정완료</button>
-          <button v-on:click="modifyItemCancle">수정취소</button>
-        </div>
-      </div>
-      <!--// modify -->
-    
   </div>
 
-  
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
 
   <!-- Latest compiled and minified JavaScript -->
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
     crossorigin="anonymous"></script>
-  
 
   <script src="/javascripts/moment.js"></script>
   <script src="https://unpkg.com/vue"></script>
-  <script src="/javascripts/boardMain.js"></script>
+  <script src="/javascripts/board-main.js"></script>
 
 </body>
