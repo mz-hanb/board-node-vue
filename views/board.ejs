@@ -160,12 +160,17 @@ override method: delete, push
           <!-- <p v-show="!addFile.onAdded">첨부한 파일을 불러올 수 없습니다.</p> -->
         </div>
         <div class="btns">
-          <button v-show="!onModify" @click="modifyItem">수정</button>
           
-          <input v-show="onModify" v-model="delPw" type="password" id="delPassword" name="delPassword">
-          <button v-show="onModify" @click="modifyItem">수정완료</button>
-          <button v-show="onModify" @click="modifyItem">취소</button>          
-          <!-- <button v-on:click="deleteItem">삭제</button> -->
+        
+          
+
+          <button v-show="!onModify" @click="modifyItem">수정</button>
+          <div class="modify-comp" v-show="onModify" >
+              <p>수정을 완료하시려면 비밀번호를 입력해주세요.</p>
+              <input v-model="delPw" type="password" id="delPassword" name="delPassword">
+              <button @click="modifyItemComp">수정완료</button>
+              <button @click="modifyItemCancle">취소</button>          
+          </div>                    
           <div class="clear"></div>
         </div>
         <div class="clear"></div>

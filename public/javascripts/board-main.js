@@ -2,6 +2,7 @@
  * vue
  * *********************************************/
 
+
 // 게시판
 const boardList = new Vue({
   el: '#v-board',
@@ -18,9 +19,11 @@ const boardList = new Vue({
       groupLimit: 5 // 한 그룹당 보여지는 페이지 수
     },
     detail: {},
+    detailPre: {},
     loadedList: [],
     addFile: {
-      onAdded: false
+      onAdded: false,
+      list: []
     },
     delPw: '',
     newItem: {
@@ -35,6 +38,10 @@ const boardList = new Vue({
     onModify: false,
     onEditable: false
   },
+  created(){
+    this.addFile.list = $('.add-files li');
+    console.log( '////// created>>> ' + this.addFile.list.length);    
+  },  
   computed: {},
   methods: {
     //--- 게시글 번호
@@ -126,7 +133,6 @@ const boardList = new Vue({
     },
     modifyItem() {
       this.onModify = true;
-
     },
     modifyItemComp() {
       var self = this;
@@ -145,8 +151,9 @@ const boardList = new Vue({
         }
       });
     },
-    modifyItemCancle() {
+    modifyItemCancle() {    
       this.onModify = false;
+      $('.add-files li').css('display', 'block');            
     },
     deleteItem() {
       var self = this;
