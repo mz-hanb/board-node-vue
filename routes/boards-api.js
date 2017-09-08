@@ -96,12 +96,28 @@ router.put('/', (req, res) => {
   const modTitle = req.body.modContentSubject;
   const modContent = req.body.modContents;
   const modId = req.body.modId;
-  const modPassword = req.body.modContentPassword;
+  const modPassword = req.body.modPw;
+  const modFiles = req.body.fileList;
+  // console.log( 'modContent ///' + modContent  );
+  // console.log( 'modId ///' + modId  );
+  // console.log( 'modPassword ///' + modPassword  );
+  // console.log( 'modFiles ///' + modFiles  );
 
-  checkPassword(modId, modPassword, (isMatch) => {
+  checkPassword(modId, modPassword, (isMatch, rowContents) => {   
+
     if (isMatch) {
+      // 첨부파일 내용이 있다면 
+      if( modFiles ){
+        var list = modFiles.split(',');
+        rowContents.fileUp.forEach((idx, fileData) => {
+          if( list[idx] == 'removed' )
+          fs.unlinkSync(fileData.fileOriginPath);          
+        });
+      }      
+      // 내용 수정
       modBoard(modId, modTitle, modContent);
       res.send();
+
     } else {
       res.send({ notice: 'not match password' });
     }
@@ -118,7 +134,6 @@ router.delete('/', (req, res) => {
       //     if(err) throw err;        
       //     res.send();        
       // });                       
-
       // BoardContents.find({_id:contentId}, function(err, originContent){                
       BoardContents.findById(contentId, (err, tgData) => {
         tgData.fileUp.forEach((fileData) => {
@@ -128,8 +143,8 @@ router.delete('/', (req, res) => {
       }).remove((err) => {
         res.send();
       });
-    } else {
-      res.setHeader('Content-Type', 'application/json');
+    } else {      
+      res.setHeader('Content-Type', 'application/json');      
       // 불일치에 대한 처리
       res.send({ notice: 'not match password' });
     }
@@ -242,7 +257,7 @@ function checkPassword(id, pw, callback) {
     } else {
       isMatch = false;
     }
-    callback(isMatch);
+    callback( isMatch, rawContents );    
   });
 }
 function makeThumbnails(fileDataList, cb) {

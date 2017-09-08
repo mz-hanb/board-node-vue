@@ -136,8 +136,13 @@ override method: delete, push
 
     <!-- board detail -->
     <div v-show="onDetail" class="board-detail board-section">
+      <form id="modify-action" action="">
         <h3>게시글 자세히 보기</h3>
-        <div class="content-title"><span class="title-label">제목</span>: {{ detail.title }}</div>
+        <!-- <div class="content-title"><span class="title-label">제목</span>: {{ detail.title }}</div> -->
+        <div class="content-title"><span class="title-label">제목</span>
+          :       <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
+          
+        </div>
         <div class="content-info"><span class="title-label">작성일</span>: {{ formateDate( detail.date) }}</div>
         <div class="detail-writer"><span class="title-label">작성자</span>: {{ detail.writer }}</div>
 
@@ -145,29 +150,32 @@ override method: delete, push
           <p class="title-label">내용</p>
           <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
           <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" v-bind:readonly="!onModify">{{ detail.contents }}</textarea>
+          <!-- id -->
+          <input type="hidden" v-bind:value="detail._id" id="modId" name="modId"> 
+          <!-- pw -->
+          <input type="hidden" v-model="modPw" id="modPw" name="modPw">
+          <!-- files -->
+          <input type="hidden" v-bind:value="modifyFileList" id="modFiles" name="modFiles">
         </div>
         <!-- <div class="download-file" v-html="addFile"> -->
         <div class="download-file" v-show="addFile.onAdded">
           <p>첨부한 이미지</p>
           <hr>
           <ul class="add-files">
-            <li v-for="file in loadedList">
+            <li v-for="file in loadedList" class="">
               <a v-bind:href="file.fileOriginPath" v-bind:download="file.fileName"><img v-bind:src="file.fileThumbPath" alt=""><span>{{file.fileName}}</span></a>              
-              <button v-show="onModify" onclick="$(this).parent().hide()">X</button>
+              <button type="button" v-show="onModify" onclick="$(this).parent().hide()">X</button>
             </li>
           </ul>
           <p v-show="!addFile.onAdded">첨부한 파일이 없습니다.</p>
           <!-- <p v-show="!addFile.onAdded">첨부한 파일을 불러올 수 없습니다.</p> -->
         </div>
+      </form>      
         <div class="btns">
-          
-        
-          
-
           <button v-show="!onModify" @click="modifyItem">수정</button>
           <div class="modify-comp" v-show="onModify" >
               <p>수정을 완료하시려면 비밀번호를 입력해주세요.</p>
-              <input v-model="delPw" type="password" id="delPassword" name="delPassword">
+              <input v-model="modPw" type="password" id="modPw" name="modPw">
               <button @click="modifyItemComp">수정완료</button>
               <button @click="modifyItemCancle">취소</button>          
           </div>                    
@@ -181,6 +189,7 @@ override method: delete, push
               <button v-on:click="deleteItem">삭제</button>
               <button v-on:click="deleteItemCancle">취소</button>
         </div>
+      
         <button class="btn-close-self" @click="onDetail=false">X</button>
         <!-- end -->
         <div class="clear"></div>

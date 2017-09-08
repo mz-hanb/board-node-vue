@@ -25,7 +25,8 @@ const boardList = new Vue({
       onAdded: false,
       list: []
     },
-    delPw: '',
+    modPw: '', 
+    delPw: '',    
     newItem: {
       title: '',
       writer: '',
@@ -38,11 +39,23 @@ const boardList = new Vue({
     onModify: false,
     onEditable: false
   },
-  created(){
-    this.addFile.list = $('.add-files li');
-    console.log( '////// created>>> ' + this.addFile.list.length);    
+  mounted(){    
+  },
+  created(){    
   },  
-  computed: {},
+  computed: {
+    modifyFileList(){      
+      var list = [];
+      $('.add-files li').each(function(idx, item){
+        if( $(item).css('display') === 'none' ){
+          list.push('removed');
+        }else{
+          list.push('exist');
+        }
+      });            
+      return list.toString();
+    }
+  },
   methods: {
     //--- 게시글 번호
     getListNum(idx){      
@@ -134,8 +147,12 @@ const boardList = new Vue({
     modifyItem() {
       this.onModify = true;
     },
-    modifyItemComp() {
-      var self = this;
+    
+    // 수정완료
+    modifyItemComp() {     
+      var self = this;     
+      // var sendData = $('#modify-action').serialize() + '&fileList=' + this.modifyFileList;
+      // console.dir( sendData ); 
       $.ajax({
         type: 'POST',
         url: 'api/boards?_method=PUT',
@@ -153,7 +170,8 @@ const boardList = new Vue({
     },
     modifyItemCancle() {    
       this.onModify = false;
-      $('.add-files li').css('display', 'block');            
+      $('.add-files li').css('display', 'block');  
+      this.modPw = '';
     },
     deleteItem() {
       var self = this;
