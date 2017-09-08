@@ -140,7 +140,7 @@ override method: delete, push
         <h3>게시글 자세히 보기</h3>
         <!-- <div class="content-title"><span class="title-label">제목</span>: {{ detail.title }}</div> -->
         <div class="content-title"><span class="title-label">제목</span>
-          :       <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
+          :       <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목" v-bind:readonly="onEditable">
           
         </div>
         <div class="content-info"><span class="title-label">작성일</span>: {{ formateDate( detail.date) }}</div>
@@ -149,7 +149,7 @@ override method: delete, push
         <div class="content-text">
           <p class="title-label">내용</p>
           <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
-          <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" v-bind:readonly="!onModify">{{ detail.contents }}</textarea>
+          <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" v-bind:readonly="onEditable">{{ detail.contents }}</textarea>
           <!-- id -->
           <input type="hidden" v-bind:value="detail._id" id="modId" name="modId"> 
           <!-- pw -->

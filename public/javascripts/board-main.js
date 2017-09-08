@@ -36,14 +36,14 @@ const boardList = new Vue({
     searchWord: '',
     onDetail: false,
     onAddNew: false,
-    onModify: false,
-    onEditable: false
+    onModify: false
   },
   mounted(){    
   },
   created(){    
   },  
   computed: {
+    // 첨부파일 수정시 사용자가 파일을 제했는지 목록
     modifyFileList(){      
       var list = [];
       $('.add-files li').each(function(idx, item){
@@ -54,6 +54,13 @@ const boardList = new Vue({
         }
       });            
       return list.toString();
+    },
+    onEditable(){
+      if( this.onModify ){
+        return !this.onModify;
+      }else{
+        return 'readonly'
+      }
     }
   },
   methods: {
@@ -150,9 +157,9 @@ const boardList = new Vue({
     
     // 수정완료
     modifyItemComp() {     
-      var self = this;     
-      // var sendData = $('#modify-action').serialize() + '&fileList=' + this.modifyFileList;
-      // console.dir( sendData ); 
+      this.detail.contentsOri = this.detail.contents;
+      var self = this;           
+      
       $.ajax({
         type: 'POST',
         url: 'api/boards?_method=PUT',
@@ -172,6 +179,7 @@ const boardList = new Vue({
       this.onModify = false;
       $('.add-files li').css('display', 'block');  
       this.modPw = '';
+      this.detail.contents = this.detail.contentsOri;
     },
     deleteItem() {
       var self = this;
