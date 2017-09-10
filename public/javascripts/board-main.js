@@ -134,10 +134,10 @@ const boardList = new Vue({
       }
     },
     addItemSubmit() {
-      if (this.newItem.title === '' || this.newItem.writer === '' || this.newItem.password === '' || this.newItem.contents === '') {
-        alert('제목과 내용, 작성자 비밀번호 모두 있어야합니다.');
-        return;
-      }
+      // if (this.newItem.title === '' || this.newItem.writer === '' || this.newItem.password === '' || this.newItem.contents === '') {
+      //   alert('제목과 내용, 작성자 비밀번호 모두 있어야합니다.');
+      //   return;
+      // }
       var self = this;
       var form = $('#write-action')[0];
       var formData = new FormData(form);
@@ -150,6 +150,9 @@ const boardList = new Vue({
         success(result) {
           self.initView();
           self.getPage();
+        },
+        error(req, status, error){
+          alert(req.responseText);
         }
       });
     },
