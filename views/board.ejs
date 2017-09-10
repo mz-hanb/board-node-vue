@@ -36,8 +36,9 @@ override method: delete, push
 - 서버쪽에서 에러가 났을때 frontend 단으로 전송하는 방식: error 처리
   client ajax( erro, error, complete callback )
 -->
+
 <body>
-  <div id="v-board" class="v-board" v-cloak >
+  <div id="v-board" class="v-board" v-cloak>
     <!-- list -->
     <div class="board-list">
       <a href="/boards">
@@ -73,10 +74,10 @@ override method: delete, push
       </table>
       <hr>
       <div class="btns">
-          <form action="/boards/search" method="get" id="action-search" name="action-search">
-            <input v-model="searchWord" type="text" class="search_word" id="searchWord" name="searchWord">
-            <button type="button" v-on:click="searchItemSubmit">검색</button>
-          </form>
+        <form action="/boards/search" method="get" id="action-search" name="action-search">
+          <input v-model="searchWord" type="text" class="search_word" id="searchWord" name="searchWord">
+          <button type="button" v-on:click="searchItemSubmit">검색</button>
+        </form>
         <button v-on:click="showAddNew()">새 글</button>
       </div>
       <nav class="pagination-wrap" aria-label="Page navigation">
@@ -86,7 +87,7 @@ override method: delete, push
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
-          <li v-for="(pageItem, idx) in objPage.listCurrent" ><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>
+          <li v-for="(pageItem, idx) in objPage.listCurrent"><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>
           <li class="btn-next-pagegroup">
             <a v-on:click="goNextPageGroup" href="#" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
@@ -99,49 +100,48 @@ override method: delete, push
 
     <!-- new content write form: 새글 쓰기 UI -->
     <div v-show="onAddNew" id="" class="write_form board-section">
-        <h3>게시글 작성하기</h3>
-        <form id="write-action" action="/boards?mode=add" method="post" enctype="multipart/form-data">
-          <!-- <form id="writeAction" action="/boards/loadFile" method="post" enctype="multipart/form-data"> -->
-          <div class="content-title">
-            <label class="title-label">제목</label>
-            <input v-model="newItem.title" type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
-          </div>
-          <div class="content-title">
-              <label class="title-label">작성자</label>
-              <input v-model="newItem.writer" type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
-            </div>
-            <div class="content-title">
-                <label class="title-label">비밀번호</label>
-                <input v-model="newItem.password" type="password" class="inputPassword" id="addContentPassword" name="addContentPassword" placeholder="비밀번호">
-              </div>
-
-              <div class="content-text">
-                  <p class="title-label">내용</p>
-                  <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
-                  <textarea v-model="newItem.contents"  class="textContents" id="addContents" name="addContents"></textarea>
-                </div>
-                <div>
-                    <p>파일 첨부하기</p>
-                    <input type="file" class="inputFile" id="UploadFile" name="UploadFile" multiple accept='image/*'>
-                </div>
-                      </form>
-
-        <div id="new" class="btns">
-          <button v-on:click="addItemSubmit">작성완료</button>
-          <button v-on:click="addItemCancle">작성취소</button>
+      <h3>게시글 작성하기</h3>
+      <form id="write-action" action="/boards?mode=add" method="post" enctype="multipart/form-data">
+        <!-- <form id="writeAction" action="/boards/loadFile" method="post" enctype="multipart/form-data"> -->
+        <div class="content-title">
+          <label class="title-label">제목</label>
+          <input v-model="newItem.title" type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
         </div>
-        <button class="btn-close-self" @click="onAddNew=false">X</button>
+        <div class="content-title">
+          <label class="title-label">작성자</label>
+          <input v-model="newItem.writer" type="text" class="inputWriter" id="addContentWriter" name="addContentWriter" placeholder="작성자">
+        </div>
+        <div class="content-title">
+          <label class="title-label">비밀번호</label>
+          <input v-model="newItem.password" type="password" class="inputPassword" id="addContentPassword" name="addContentPassword"
+            placeholder="비밀번호">
+        </div>
+        <div class="content-text">
+          <p class="title-label">내용</p>
+          <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
+          <textarea v-model="newItem.contents" class="textContents" id="addContents" name="addContents"></textarea>
+        </div>
+        <div>
+          <p>파일 첨부하기</p>
+          <input type="file" class="inputFile" id="UploadFile" name="UploadFile" multiple accept='image/*'>
+        </div>
+      </form>
+
+      <div id="new" class="btns">
+        <button v-on:click="addItemSubmit">작성완료</button>
+        <button v-on:click="addItemCancle">작성취소</button>
       </div>
-      <!--// new content write form: 새글 쓰기 UI -->
+      <button class="btn-close-self" @click="onAddNew=false">X</button>
+    </div>
+    <!--// new content write form: 새글 쓰기 UI -->
 
     <!-- board detail -->
     <div v-show="onDetail" class="board-detail board-section">
       <form id="modify-action" action="">
         <h3>게시글 자세히 보기</h3>
         <!-- <div class="content-title"><span class="title-label">제목</span>: {{ detail.title }}</div> -->
-        <div class="content-title"><span class="title-label">제목</span>
-          :       <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject" name="modContentSubject" placeholder="제목">
-          
+        <div class="content-title"><span class="title-label">제목</span> : <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject"
+            name="modContentSubject" v-bind:readonly="!onModify" placeholder="제목">
         </div>
         <div class="content-info"><span class="title-label">작성일</span>: {{ formateDate( detail.date) }}</div>
         <div class="detail-writer"><span class="title-label">작성자</span>: {{ detail.writer }}</div>
@@ -151,7 +151,7 @@ override method: delete, push
           <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
           <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" v-bind:readonly="!onModify">{{ detail.contents }}</textarea>
           <!-- id -->
-          <input type="hidden" v-bind:value="detail._id" id="modId" name="modId"> 
+          <input type="hidden" v-bind:value="detail._id" id="modId" name="modId">
           <!-- pw -->
           <input type="hidden" v-model="modPw" id="modPw" name="modPw">
           <!-- files -->
@@ -159,41 +159,71 @@ override method: delete, push
         </div>
         <!-- <div class="download-file" v-html="addFile"> -->
         <div class="download-file" v-show="addFile.onAdded">
-          <p>첨부한 이미지</p>
+          <h4>첨부한 이미지</h4>
           <hr>
           <ul class="add-files">
             <li v-for="file in loadedList" class="">
-              <a v-bind:href="file.fileOriginPath" v-bind:download="file.fileName"><img v-bind:src="file.fileThumbPath" alt=""><span>{{file.fileName}}</span></a>              
+              <a v-bind:href="file.fileOriginPath" v-bind:download="file.fileName"><img v-bind:src="file.fileThumbPath" alt=""><span>{{file.fileName}}</span></a>
               <button type="button" v-show="onModify" onclick="$(this).parent().hide()">X</button>
             </li>
           </ul>
           <p v-show="!addFile.onAdded">첨부한 파일이 없습니다.</p>
           <!-- <p v-show="!addFile.onAdded">첨부한 파일을 불러올 수 없습니다.</p> -->
         </div>
-      </form>      
-        <div class="btns">
-          <button v-show="!onModify" @click="modifyItem">수정</button>
-          <div class="modify-comp" v-show="onModify" >
-              <p>수정을 완료하시려면 비밀번호를 입력해주세요.</p>
-              <input v-model="modPw" type="password" id="modPw" name="modPw">
-              <button @click="modifyItemComp">수정완료</button>
-              <button @click="modifyItemCancle">취소</button>          
-          </div>                    
-          <div class="clear"></div>
+      </form>
+      <!--// add files  -->
+
+      <!-- add reply -->
+      <div class="reply-wrap">
+          <h4>댓글목록</h4>
+          <hr>
+        <ul class="replies">          
+          <li class="reply" v-for="reply in replies">
+            <p class="writer">작성자: {{reply.name}}</p>
+            <p class="contents">{{reply.memo}}</p>
+          </li>
+        </ul>
+        <h4>댓글달기</h4>
+        <hr>
+        <form id="add-reply" class="add-reply" action="" method="post" enctype="multipart/form-data">
+          
+          <div class="content-title">
+            <label class="title-label">작성자</label>
+            <input v-bind:value="replyWriter" type="text" class="" id="replyWriter" name="replyWriter" placeholder="작성자">
+          </div>          
+          <div class="content-text">
+            <p class="title-label">내용</p>
+            <textarea v-bind:value="replyComment"  class="replyComment" id="replyComment" name="replyComment"></textarea>
+          </div>
+          <input type="hidden" v-bind:value="detail._id" id="replyId" name="replyId">
+          <div><button type="button" @click="addReply">댓글달기</button></div>
+        </form>
+      </div>
+
+      <!--// add reply -->
+      <div class="btns">        
+        <button v-show="!onModify" @click="modifyItem">수정</button>
+        <div class="modify-comp" v-show="onModify">
+          <p>수정을 완료하시려면 비밀번호를 입력해주세요.</p>
+          <input v-model="modPw" type="password" id="modPw" name="modPw">
+          <button @click="modifyItemComp">수정완료</button>
+          <button @click="modifyItemCancle">취소</button>
         </div>
-        <div class="clear"></div>
-        <!-- delete confirm window -->
-        <div class="delete_confirm">
-              <span>비밀 번호를 입력하고 글이 삭제됩니다.</span><br>
-              <input v-model="delPw" type="password" id="delPassword" name="delPassword">
-              <button v-on:click="deleteItem">삭제</button>
-              <button v-on:click="deleteItemCancle">취소</button>
-        </div>
-      
-        <button class="btn-close-self" @click="onDetail=false">X</button>
-        <!-- end -->
         <div class="clear"></div>
       </div>
+      <div class="clear"></div>
+      <!-- delete confirm window -->
+      <div class="delete_confirm">
+        <span>비밀 번호를 입력하고 글이 삭제됩니다.</span><br>
+        <input v-model="delPw" type="password" id="delPassword" name="delPassword">
+        <button v-on:click="deleteItem">삭제</button>
+        <button v-on:click="deleteItemCancle">취소</button>
+      </div>
+
+      <button class="btn-close-self" @click="onDetail=false">X</button>
+      <!-- end -->
+      <div class="clear"></div>
+    </div>
   </div>
 
 

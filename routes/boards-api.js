@@ -157,14 +157,17 @@ router.get('/download/:path', (req, res) => {
   res.download(`./upload/${path}`, path);
   // console.log(path);
 });
+// 댓글
 router.post('/reply', (req, res) => {
   // 댓글 다는 부분
   const reply_writer = req.body.replyWriter;
   const reply_comment = req.body.replyComment;
   const reply_id = req.body.replyId;
+  console.log( reply_writer  );
+  console.log( reply_comment  );
 
   addComment(reply_id, reply_writer, reply_comment);
-  res.redirect(`/boards/view?id=${reply_id}`);
+  res.send();
 });
 router.get('/reply', (req, res) => {
   // 댓글 ajax로 페이징 하는 부분

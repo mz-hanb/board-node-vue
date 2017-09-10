@@ -37,7 +37,13 @@ const boardList = new Vue({
     onDetail: false,
     onAddNew: false,
     onModify: false,
-    onEditable: false
+    onEditable: false,
+    onReply: false,
+    replies: [],
+    onShowReplies: false,
+    replyWriter: '',
+    replyComment: ''
+
   },
   mounted(){    
   },
@@ -66,7 +72,8 @@ const boardList = new Vue({
       var thisPage = this.objPage;      
       // page 
       if (page === null || page === undefined) page = 1;
-      thisPage.pageCurrent = page;      
+      thisPage.pageCurrent = page; 
+          
       // search word
       if (searchWord === null || searchWord === undefined) searchWord = '';
 
@@ -86,6 +93,7 @@ const boardList = new Vue({
         });
         thisPage.groupCurrent = objCurrentPage[0].pageGroup;    
         self.getCurrentPageList();        
+        
       });
     },
     showDetail(id) {
@@ -105,6 +113,10 @@ const boardList = new Vue({
         } else {
           self.addFile.onAdded = false;
         }
+        // console.log( self.detail.comments );
+        self.replies = self.detail.comments;   
+        self.replyWriter = ''; 
+        self.replyComment = '';   
       });
     },
     setLoadedFile(list) {
@@ -145,14 +157,14 @@ const boardList = new Vue({
       this.onAddNew = false;
     },
     modifyItem() {
-      this.onModify = true;
+      this.onModify = "readonly";
+      this.detail.contentsOri = this.detail.contents; 
+      this.modPw = '';    
     },
     
     // 수정완료
     modifyItemComp() {     
-      var self = this;     
-      // var sendData = $('#modify-action').serialize() + '&fileList=' + this.modifyFileList;
-      // console.dir( sendData ); 
+      var self = this;           
       $.ajax({
         type: 'POST',
         url: 'api/boards?_method=PUT',
@@ -172,6 +184,7 @@ const boardList = new Vue({
       this.onModify = false;
       $('.add-files li').css('display', 'block');  
       this.modPw = '';
+      this.detail.contents = this.detail.contentsOri;
     },
     deleteItem() {
       var self = this;
@@ -233,29 +246,21 @@ const boardList = new Vue({
       thisPage.listCurrent = thisPage.list.slice(startNum, endNum);  
       console.dir(  thisPage.listCurrent  );   
     },
-    removeAddFile(tgEle){
-      console.log( tgEle );
-      // $tgEle.hide();
-    },
-    // 비밀번호 확인
-    checkPw(){
-      var self = this;
+    // reply 
+    addReply(){
+      var self = this;           
       $.ajax({
         type: 'POST',
-        url: `api/boards?id=${this.detail._id}&pw=${this.delPw}`,
+        url: 'api/boards/reply',
+        data: $('#add-reply').serialize(),
+        async: false,
         success(data) {
-          if (data.notice) {
-            alert('비밀번호가 일치하지 않습니다.');
-          } else {
-            self.initView();
-            self.getPage();
-          }
+          self.initView();
+          self.getPage();
         }
-      });
-
-    }
-
-  },
+      });   
+    } 
+  }
 });
 
 boardList.getPage();
