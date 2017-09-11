@@ -36,8 +36,7 @@ const boardList = new Vue({
     searchWord: '',
     onDetail: false,
     onAddNew: false,    
-    onModify: false,
-    onEditable: false,
+    onModify: false,    
     onReply: false,
     replies: [],
     onShowReplies: false,
@@ -103,6 +102,7 @@ const boardList = new Vue({
         
       });
     },
+    // 게시글 보기
     showDetail(id) {
       var self = this;
       $.get(`api/boards/view?id=${id}`, function (data, status) {
@@ -124,6 +124,7 @@ const boardList = new Vue({
         self.replies = self.detail.comments;   
         self.replyWriter = ''; 
         self.replyComment = '';   
+        console.log( 'shoeDetail> ' + self.detail.title);
       });
     },
     setLoadedFile(list) {
@@ -169,12 +170,12 @@ const boardList = new Vue({
     modifyItem() {
       this.onModify = "readonly";
       this.detail.contentsOri = this.detail.contents; 
+      this.detail.titleOri = this.detail.title;
       this.modPw = '';    
     },
     
     // 수정완료
-    modifyItemComp() {     
-      this.detail.contentsOri = this.detail.contents;
+    modifyItemComp() {           
       var self = this;          
       
       $.ajax({
@@ -197,6 +198,7 @@ const boardList = new Vue({
       $('.add-files li').css('display', 'block');  
       this.modPw = '';
       this.detail.contents = this.detail.contentsOri;
+      this.detail.title = this.detail.titleOri;            
     },
     deleteItem() {
       var self = this;

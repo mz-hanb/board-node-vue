@@ -139,16 +139,15 @@ override method: delete, push
     <div v-show="onDetail" class="board-detail board-section">
       <form id="modify-action" action="">
         <h3>게시글 자세히 보기</h3>
-        <!-- <div class="content-title"><span class="title-label">제목</span>: {{ detail.title }}</div> -->
+        <!-- title -->
         <div class="content-title"><span class="title-label">제목</span> : <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject"
-            name="modContentSubject" v-bind:readonly="!onModify" placeholder="제목">
+            name="modContentSubject" v-bind:readonly="onEditable" placeholder="제목">
         </div>
         <div class="content-info"><span class="title-label">작성일</span>: {{ formateDate( detail.date) }}</div>
         <div class="detail-writer"><span class="title-label">작성자</span>: {{ detail.writer }}</div>
-
+        <!-- contents -->
         <div class="content-text">
           <p class="title-label">내용</p>
-          <!-- <div class="detail-contents">{{ detail.contents }}</div> -->
           <textarea v-model="detail.contents" class="textContents" id="modContents" name="modContents" v-bind:readonly="onEditable">{{ detail.contents }}</textarea>
           <!-- id -->
           <input type="hidden" v-bind:value="detail._id" id="modId" name="modId">
@@ -175,9 +174,9 @@ override method: delete, push
 
       <!-- add reply -->
       <div class="reply-wrap">
-          <h4>댓글목록</h4>
-          <hr>
-        <ul class="replies">          
+        <h4>댓글목록</h4>
+        <hr>
+        <ul class="replies">
           <li class="reply" v-for="reply in replies">
             <p class="writer">작성자: {{reply.name}}</p>
             <p class="contents">{{reply.memo}}</p>
@@ -186,14 +185,14 @@ override method: delete, push
         <h4>댓글달기</h4>
         <hr>
         <form id="add-reply" class="add-reply" action="" method="post" enctype="multipart/form-data">
-          
+
           <div class="content-title">
             <label class="title-label">작성자</label>
             <input v-bind:value="replyWriter" type="text" class="" id="replyWriter" name="replyWriter" placeholder="작성자">
-          </div>          
+          </div>
           <div class="content-text">
             <p class="title-label">내용</p>
-            <textarea v-bind:value="replyComment"  class="replyComment" id="replyComment" name="replyComment"></textarea>
+            <textarea v-bind:value="replyComment" class="replyComment" id="replyComment" name="replyComment"></textarea>
           </div>
           <input type="hidden" v-bind:value="detail._id" id="replyId" name="replyId">
           <div><button type="button" @click="addReply">댓글달기</button></div>
@@ -201,7 +200,7 @@ override method: delete, push
       </div>
 
       <!--// add reply -->
-      <div class="btns">        
+      <div class="btns">
         <button v-show="!onModify" @click="modifyItem">수정</button>
         <div class="modify-comp" v-show="onModify">
           <p>수정을 완료하시려면 비밀번호를 입력해주세요.</p>
