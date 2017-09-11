@@ -2,13 +2,23 @@ $color-line: #ddd;
 [v-cloak]{
   display: none;
 }
-li{
-  list-style: none;
+
+hr{
+  margin: 0 !important;
 }
 textarea{
   width: 100%;
   height: 100px; 
   margin: 20px 0;
+}
+ul, ol{
+  // padding: 0 !important;
+}
+li{
+  list-style: none;
+}
+p{
+  margin: 0 !important;
 }
 .v-board{
   max-width: 600px;
@@ -19,6 +29,10 @@ textarea{
     padding: 5px 0;
     border-bottom: 1px solid $color-line;
     color: olive;
+  }
+  h4{
+    color: olive;
+    margin: 20px 0 5px 0;
   }
 }
 .board-section{
@@ -49,10 +63,7 @@ textarea{
 .board-list{
   table{
     margin: 0;
-  }
-  hr{
-    margin: 0;
-  }
+  }  
   .pagination-wrap{
     text-align: center;
   }
@@ -69,8 +80,8 @@ textarea{
   display: inline-block;
   width: 60px;
 }
-.content-text{
-  margin-top: 20px;    
+
+.content-text{  
   .detail-contents{
     padding: 3px;
     height: 100px;
@@ -104,6 +115,27 @@ textarea{
   }  
   .delete_confirm{
     text-align: right;
+  }
+  .reply-wrap{
+    .replies, .add-reply{
+      padding: 0 20px;
+    }
+  }
+  .replies{
+    .reply{
+      margin-top: 15px;
+    }
+    .contents{
+      border: 1px solid #e5e5e5;
+      border-radius: 5;
+      padding: 3px;
+    }
+  }
+  .add-reply{
+    margin-top: 15px;
+    textarea{
+      height: 50px;
+    }
   }
 }
 

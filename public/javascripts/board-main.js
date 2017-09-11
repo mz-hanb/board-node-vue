@@ -35,8 +35,14 @@ const boardList = new Vue({
     },
     searchWord: '',
     onDetail: false,
-    onAddNew: false,
-    onModify: false
+    onAddNew: false,    
+    onModify: false,
+    onEditable: false,
+    onReply: false,
+    replies: [],
+    onShowReplies: false,
+    replyWriter: '',
+    replyComment: ''
   },
   mounted(){    
   },
@@ -73,7 +79,8 @@ const boardList = new Vue({
       var thisPage = this.objPage;      
       // page 
       if (page === null || page === undefined) page = 1;
-      thisPage.pageCurrent = page;      
+      thisPage.pageCurrent = page; 
+          
       // search word
       if (searchWord === null || searchWord === undefined) searchWord = '';
 
@@ -93,6 +100,7 @@ const boardList = new Vue({
         });
         thisPage.groupCurrent = objCurrentPage[0].pageGroup;    
         self.getCurrentPageList();        
+        
       });
     },
     showDetail(id) {
@@ -112,6 +120,10 @@ const boardList = new Vue({
         } else {
           self.addFile.onAdded = false;
         }
+        // console.log( self.detail.comments );
+        self.replies = self.detail.comments;   
+        self.replyWriter = ''; 
+        self.replyComment = '';   
       });
     },
     setLoadedFile(list) {
@@ -129,10 +141,10 @@ const boardList = new Vue({
       }
     },
     addItemSubmit() {
-      if (this.newItem.title === '' || this.newItem.writer === '' || this.newItem.password === '' || this.newItem.contents === '') {
-        alert('제목과 내용, 작성자 비밀번호 모두 있어야합니다.');
-        return;
-      }
+      // if (this.newItem.title === '' || this.newItem.writer === '' || this.newItem.password === '' || this.newItem.contents === '') {
+      //   alert('제목과 내용, 작성자 비밀번호 모두 있어야합니다.');
+      //   return;
+      // }
       var self = this;
       var form = $('#write-action')[0];
       var formData = new FormData(form);
@@ -145,6 +157,9 @@ const boardList = new Vue({
         success(result) {
           self.initView();
           self.getPage();
+        },
+        error(req, status, error){
+          alert(req.responseText);
         }
       });
     },
@@ -152,13 +167,15 @@ const boardList = new Vue({
       this.onAddNew = false;
     },
     modifyItem() {
-      this.onModify = true;
+      this.onModify = "readonly";
+      this.detail.contentsOri = this.detail.contents; 
+      this.modPw = '';    
     },
     
     // 수정완료
     modifyItemComp() {     
       this.detail.contentsOri = this.detail.contents;
-      var self = this;           
+      var self = this;          
       
       $.ajax({
         type: 'POST',
@@ -241,29 +258,21 @@ const boardList = new Vue({
       thisPage.listCurrent = thisPage.list.slice(startNum, endNum);  
       console.dir(  thisPage.listCurrent  );   
     },
-    removeAddFile(tgEle){
-      console.log( tgEle );
-      // $tgEle.hide();
-    },
-    // 비밀번호 확인
-    checkPw(){
-      var self = this;
+    // reply 
+    addReply(){
+      var self = this;           
       $.ajax({
         type: 'POST',
-        url: `api/boards?id=${this.detail._id}&pw=${this.delPw}`,
+        url: 'api/boards/reply',
+        data: $('#add-reply').serialize(),
+        async: false,
         success(data) {
-          if (data.notice) {
-            alert('비밀번호가 일치하지 않습니다.');
-          } else {
-            self.initView();
-            self.getPage();
-          }
+          self.initView();
+          self.getPage();
         }
-      });
-
-    }
-
-  },
+      });   
+    } 
+  }
 });
 
 boardList.getPage();

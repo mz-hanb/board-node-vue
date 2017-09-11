@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const gm = require('gm');
 const multer = require('multer');
+const validator = require('validator'); // validator
+
 // 파일 저장을 위한  multer
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -79,7 +81,14 @@ router.post('/', upload.array('UploadFile'), (req, res) => {
   const addNewWriter = req.body.addContentWriter;
   const addNewPassword = req.body.addContentPassword;
   const addNewContent = req.body.addContents;
-  const upFile = req.files; // 업로드 된 파일을 받아옴        
+
+  const upFile = req.files; // 업로드 된 파일을 받아옴      
+
+  // 작성내용 중 빈 내용이 없는지에 유효성 검사
+  if( validator.isEmpty( addNewTitle ) ||  validator.isEmpty( addNewWriter ) || validator.isEmpty( addNewPassword ) ||  validator.isEmpty( addNewContent ) ){
+    res.status(401).send('제목과 내용, 작성자 비밀번호 모두 있어야합니다.');
+    return;
+  }
 
   if (upFile.length > 0) {
     makeThumbnails(upFile, () => {
@@ -157,14 +166,17 @@ router.get('/download/:path', (req, res) => {
   res.download(`./upload/${path}`, path);
   // console.log(path);
 });
+// 댓글
 router.post('/reply', (req, res) => {
   // 댓글 다는 부분
   const reply_writer = req.body.replyWriter;
   const reply_comment = req.body.replyComment;
   const reply_id = req.body.replyId;
+  console.log( reply_writer  );
+  console.log( reply_comment  );
 
   addComment(reply_id, reply_writer, reply_comment);
-  res.redirect(`/boards/view?id=${reply_id}`);
+  res.send();
 });
 router.get('/reply', (req, res) => {
   // 댓글 ajax로 페이징 하는 부분
