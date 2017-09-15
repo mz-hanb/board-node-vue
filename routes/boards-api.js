@@ -4,7 +4,9 @@ const fs = require('fs');
 const path = require('path');
 const gm = require('gm');
 const multer = require('multer');
-const validator = require('validator'); // validator
+const validator = require('validator');
+const csurf = require('csurf');
+const csrfProtection = csurf({ cookie: true }); //set save token secret to user cookie or req.session
 
 // 파일 저장을 위한  multer
 const storage = multer.diskStorage({
@@ -17,19 +19,19 @@ const storage = multer.diskStorage({
   },
 });
 
-// var upload = multer({dest:'./tmp/'}); // multer 경로 설정, 파일이 업로드 되면 먼저 임시 폴더로 가서 저장됨
 const upload = multer({ storage });
 const router = express.Router();
 var limitSize = 2; // 페이지당 게시글 수 
 
 //= ==
-router.get('/get-list', (req, res) => {
+// 
+router.get('/get-list', csrfProtection, (req, res) => {
   const search_word = req.param('searchWord');
   const searchCondition = { $regex: search_word };
 
   let page = req.param('page');
   if (page == null) { page = 1; }
-  
+
   const skipSize = (page - 1) * limitSize;
   let pageNum = 1;
 
@@ -44,9 +46,12 @@ router.get('/get-list', (req, res) => {
     });
   });
 });
-//= == 게시판 상세보기
 
-router.get('/view', (req, res) => {
+//= == 게시판 상세보기
+//  /:id
+// router.get('/view', csrfProtection, (req, res) => {
+router.get('/:id', csrfProtection, (req, res) => {
+
   // 글 보는 부분. 글 내용을 출력하고 조회수를 늘려줘야함
   // 댓글 페이지 추가 해줌, 5개씩 출력함
   const contentId = req.param('id');
@@ -62,20 +67,20 @@ router.get('/view', (req, res) => {
 
       // console.log( rawContent.fileUp.length );
       if (rawContent.fileUp.length > 0) {
-        rawContent.fileUp.forEach(function (fileData){
-          fs.existsSync(fileData.fileThumbPath, function (result){
+        rawContent.fileUp.forEach(function (fileData) {
+          fs.existsSync(fileData.fileThumbPath, function (result) {
             fileData.exist = result;
           });
         });
       }
-
-
       res.send(JSON.stringify({ title: 'Board', content: rawContent, replyPage: reply_pg }));
     });
   });
 });
+
 //= == 게시글 작성
-router.post('/', upload.array('UploadFile'), (req, res) => {
+router.post('/', csrfProtection, upload.array('UploadFile'), (req, res) => {
+  // router.route('/').post(csrfProtection, upload.array('UploadFile'), (req, res) => {
   // field name은 form의 input file의 name과 같아야함    
   const addNewTitle = req.body.addContentSubject;
   const addNewWriter = req.body.addContentWriter;
@@ -85,7 +90,7 @@ router.post('/', upload.array('UploadFile'), (req, res) => {
   const upFile = req.files; // 업로드 된 파일을 받아옴      
 
   // 작성내용 중 빈 내용이 없는지에 유효성 검사
-  if( validator.isEmpty( addNewTitle ) ||  validator.isEmpty( addNewWriter ) || validator.isEmpty( addNewPassword ) ||  validator.isEmpty( addNewContent ) ){
+  if (validator.isEmpty(addNewTitle) || validator.isEmpty(addNewWriter) || validator.isEmpty(addNewPassword) || validator.isEmpty(addNewContent)) {
     res.status(401).send('제목과 내용, 작성자 비밀번호 모두 있어야합니다.');
     return;
   }
@@ -100,8 +105,10 @@ router.post('/', upload.array('UploadFile'), (req, res) => {
     res.send();
   }
 });
+
 //= == 게시글 수정
-router.put('/', (req, res) => {
+router.put('/', csrfProtection, (req, res) => {
+  // router.route('/').put(csrfProtection, (req, res) => {
   const modTitle = req.body.modContentSubject;
   const modContent = req.body.modContents;
   const modId = req.body.modId;
@@ -111,74 +118,94 @@ router.put('/', (req, res) => {
   // console.log( 'modId ///' + modId  );
   // console.log( 'modPassword ///' + modPassword  );
   // console.log( 'modFiles ///' + modFiles  );
+  checkPassword(modId, modPassword, (err, rowContents) => {
+    if (err) console.log('//////////////////////////////err');
 
-  checkPassword(modId, modPassword, (isMatch, rowContents) => {   
-
-    if (isMatch) {
-      // 첨부파일 내용이 있다면 
-      if( modFiles ){
-        var list = modFiles.split(',');
-        rowContents.fileUp.forEach((idx, fileData) => {
-          if( list[idx] == 'removed' )
-          fs.unlinkSync(fileData.fileOriginPath);          
-        });
-      }      
-      // 내용 수정
-      modBoard(modId, modTitle, modContent);
-      res.send();
-
-    } else {
-      res.send({ notice: 'not match password' });
+    if (modFiles) {
+      var list = modFiles.split(',');
+      rowContents.fileUp.forEach((idx, fileData) => {
+        if (list[idx] == 'removed')
+          fs.unlinkSync(fileData.fileOriginPath);
+      });
     }
+    // 내용 수정
+    modBoard(modId, modTitle, modContent);
+    res.send();
   });
 });
-//= == 게시글 삭제
+//= == 게시글 삭제 (--)>
+// router.delete('/', csrfProtection, (req, res) => {
 router.delete('/', (req, res) => {
+
   const contentId = req.param('id');
   const delPw = req.param('pw');
 
-  checkPassword(contentId, delPw, (isMatch) => {
-    if (isMatch) {
-      // BoardContents.update({_id:contentId}, {$set:{deleted:true}}, function(err){
-      //     if(err) throw err;        
-      //     res.send();        
-      // });                       
-      // BoardContents.find({_id:contentId}, function(err, originContent){                
-      BoardContents.findById(contentId, (err, tgData) => {
-        tgData.fileUp.forEach((fileData) => {
-          fs.unlinkSync(fileData.fileOriginPath);
-          fs.unlinkSync(fileData.fileThumbPath);
-        });
-      }).remove((err) => {
-        res.send();
+  checkPassword(contentId, delPw, (err, data) => {
+    if (err) console.log('//////////////////////////////err');
+    if (data.fileUp.length > 0) {
+      var removeCnt = 0;
+      data.fileUp.forEach((fileData) => {
+        fs.unlinkSync(fileData.fileOriginPath);
+        fs.unlinkSync(fileData.fileThumbPath);
+        removeCnt++;
       });
-    } else {      
-      res.setHeader('Content-Type', 'application/json');      
-      // 불일치에 대한 처리
-      res.send({ notice: 'not match password' });
+      if (removeCnt === data.fileUp.length) {
+        data.remove(function (err) {
+          res.send();
+        });
+      }
     }
+    data.remove(function (err) {
+      res.send();
+    });
   });
-});
 
-router.get('/download/:path', (req, res) => {
+  // // router.delete('/', (req, res) => {
+  //   const contentId = req.param('id');
+  //   const delPw = req.param('pw');  
+
+  //   checkPassword(contentId, delPw, function(isMath, tgData){
+  //     if( isMath ){
+  //       if( tgData.fileUp && tgData.fileUp.length > 0 ){
+  //         console.dir(tgData.fileUp );
+  //         var removeCnt = 0;
+  //         tgData.fileUp.forEach((fileData) => {
+  //           fs.unlinkSync(fileData.fileOriginPath);
+  //           fs.unlinkSync(fileData.fileThumbPath);
+  //           removeCnt++;
+  //         });
+  //         if( removeCnt === tgData.fileUp.length-1){
+  //           BoardContents.findByIdAndRemove(contentId,{}, function(err){
+  //             res.send();
+  //           })           
+  //         }
+  //       }else{
+  //         BoardContents.findByIdAndRemove(contentId,{}, function(err){
+  //           res.send();
+  //         })           
+  //       }
+
+
+  //     }else{
+  //       res.setHeader('Content-Type', 'application/json');            
+  //       res.send({ notice: 'not match password' });
+  //     }    
+  //   });
+
+
+});
+// 경로 노출 안되게... 수정
+// 감추어야 하는 경로까지 노출가능성이 된다.
+// 파일에 대한 코드 값을 넣던지... 파일만있는 저장소가 있던가... 소스가 다른 장소인
+router.get('/download/:path', csrfProtection, (req, res) => {
   // file download
   const path = req.params.path;
   res.download(`./upload/${path}`, path);
   // console.log(path);
 });
-// 댓글
-router.post('/reply', (req, res) => {
-  // 댓글 다는 부분
-  const reply_writer = req.body.replyWriter;
-  const reply_comment = req.body.replyComment;
-  const reply_id = req.body.replyId;
-  console.log( reply_writer  );
-  console.log( reply_comment  );
 
-  addComment(reply_id, reply_writer, reply_comment);
-  res.send();
-});
-router.get('/reply', (req, res) => {
+//=== 댓글
+router.get('/reply', csrfProtection, (req, res) => {
   // 댓글 ajax로 페이징 하는 부분
   const id = req.param('id');
   const page = req.param('page');
@@ -249,30 +276,19 @@ function modBoard(id, title, content) {
     if (err) throw err;
   });
 }
-
-function addComment(id, writer, comment) {
-  BoardContents.findOne({ _id: id }, (err, rawContent) => {
-    if (err) throw err;
-
-    rawContent.comments.unshift({ name: writer, memo: comment });
-    rawContent.save((err) => {
-      if (err) throw err;
-    });
-  });
-}
 // check password
-function checkPassword(id, pw, callback) {  
+function checkPassword(id, pw, callback) {
   BoardContents.findOne({ _id: id }, (err, rawContents) => {
     let isMatch = false;
-    if (rawContents.password === pw) {
-      isMatch = true;
-    } else {
-      isMatch = false;
-    }
-    callback( isMatch, rawContents );    
+    if (rawContents.password === pw) {      
+      callback(null, rawContents);
+
+    } else {      
+      callback(err, null);
+    }    
   });
 }
-function makeThumbnails(fileDataList, cb) {
+function makeThumbnails(fileDataList, callback) {
   let cnt = 0;
   fileDataList.forEach((file, idx) => {
     console.dir(file);
@@ -290,7 +306,7 @@ function makeThumbnails(fileDataList, cb) {
         file.thumbUrl = stPath;
         cnt++;
         if (cnt === fileDataList.length) {
-          cb();
+          callback();
         }
       });
   });

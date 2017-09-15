@@ -201,6 +201,10 @@ basic-auth@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/basic-auth/-/basic-auth-1.1.0.tgz#45221ee429f7ee1e5035be3f51533f1cdfd29884"
 
+bcrypt-nodejs@^0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/bcrypt-nodejs/-/bcrypt-nodejs-0.0.3.tgz#c60917f26dc235661566c681061c303c2b28842b"
+
 bcrypt-pbkdf@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/bcrypt-pbkdf/-/bcrypt-pbkdf-1.0.1.tgz#63bc5dcb61331b92bc05fd528953c33462a06f8d"
@@ -373,6 +377,10 @@ concat-stream@^1.5.0, concat-stream@^1.6.0:
     readable-stream "^2.2.2"
     typedarray "^0.0.6"
 
+connect-flash@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/connect-flash/-/connect-flash-0.1.1.tgz#d8630f26d95a7f851f9956b1e8cc6732f3b6aa30"
+
 console-control-strings@^1.0.0, console-control-strings@~1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/console-control-strings/-/console-control-strings-1.1.0.tgz#3d7cf4464db6446ea644bf4b39507f9851008e8e"
@@ -412,6 +420,10 @@ core-util-is@1.0.2, core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
 
+crc@3.4.4:
+  version "3.4.4"
+  resolved "https://registry.yarnpkg.com/crc/-/crc-3.4.4.tgz#9da1e980e3bd44fc5c93bf5ab3da3378d85e466b"
+
 cross-spawn@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-3.0.1.tgz#1256037ecb9f0c5f79e3d6ef135e30770184b982"
@@ -439,6 +451,23 @@ cryptiles@2.x.x:
   resolved "https://registry.yarnpkg.com/cryptiles/-/cryptiles-2.0.5.tgz#3bdfecdc608147c1c67202fa291e7dca59eaa3b8"
   dependencies:
     boom "2.x.x"
+
+csrf@~3.0.3:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/csrf/-/csrf-3.0.6.tgz#b61120ddceeafc91e76ed5313bb5c0b2667b710a"
+  dependencies:
+    rndm "1.2.0"
+    tsscmp "1.0.5"
+    uid-safe "2.1.4"
+
+csurf@^1.9.0:
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/csurf/-/csurf-1.9.0.tgz#49d2c6925ffcec7b7de559597c153fa533364133"
+  dependencies:
+    cookie "0.3.1"
+    cookie-signature "1.0.6"
+    csrf "~3.0.3"
+    http-errors "~1.5.0"
 
 currently-unhandled@^0.4.1:
   version "0.4.1"
@@ -753,6 +782,20 @@ etag@~1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.0.tgz#6f631aef336d6c46362b51764044ce216be3c051"
 
+express-session@^1.15.5:
+  version "1.15.5"
+  resolved "https://registry.yarnpkg.com/express-session/-/express-session-1.15.5.tgz#f49a18227263b316f6f8544da5fee25a540259ec"
+  dependencies:
+    cookie "0.3.1"
+    cookie-signature "1.0.6"
+    crc "3.4.4"
+    debug "2.6.8"
+    depd "~1.1.1"
+    on-headers "~1.0.1"
+    parseurl "~1.3.1"
+    uid-safe "~2.1.4"
+    utils-merge "1.0.0"
+
 express@~4.15.2:
   version "4.15.4"
   resolved "https://registry.yarnpkg.com/express/-/express-4.15.4.tgz#032e2253489cf8fce02666beca3d11ed7a2daed1"
@@ -1045,6 +1088,14 @@ hooks-fixed@2.0.0:
 hosted-git-info@^2.1.4:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/hosted-git-info/-/hosted-git-info-2.5.0.tgz#6d60e34b3abbc8313062c3b798ef8d901a07af3c"
+
+http-errors@~1.5.0:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.5.1.tgz#788c0d2c1de2c81b9e6e8c01843b6b97eb920750"
+  dependencies:
+    inherits "2.0.3"
+    setprototypeof "1.0.2"
+    statuses ">= 1.3.1 < 2"
 
 http-errors@~1.6.1, http-errors@~1.6.2:
   version "1.6.2"
@@ -1738,6 +1789,23 @@ parseurl@~1.3.1:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/parseurl/-/parseurl-1.3.1.tgz#c8ab8c9223ba34888aa64a297b28853bec18da56"
 
+passport-local@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/passport-local/-/passport-local-1.0.0.tgz#1fe63268c92e75606626437e3b906662c15ba6ee"
+  dependencies:
+    passport-strategy "1.x.x"
+
+passport-strategy@1.x.x:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/passport-strategy/-/passport-strategy-1.0.0.tgz#b5539aa8fc225a3d1ad179476ddf236b440f52e4"
+
+passport@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/passport/-/passport-0.4.0.tgz#c5095691347bd5ad3b5e180238c3914d16f05811"
+  dependencies:
+    passport-strategy "1.x.x"
+    pause "0.0.1"
+
 path-exists@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/path-exists/-/path-exists-2.1.0.tgz#0feb6c64f0fc518d9a754dd5efb62c7022761f4b"
@@ -1777,6 +1845,10 @@ path-type@^2.0.0:
   resolved "https://registry.yarnpkg.com/path-type/-/path-type-2.0.0.tgz#f012ccb8415b7096fc2daa1054c3d72389594c73"
   dependencies:
     pify "^2.0.0"
+
+pause@0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/pause/-/pause-0.0.1.tgz#1d408b3fdb76923b9543d96fb4c9dfd535d9cb5d"
 
 performance-now@^0.2.0:
   version "0.2.0"
@@ -1853,6 +1925,10 @@ qs@6.4.0, qs@~6.4.0:
 qs@6.5.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.0.tgz#8d04954d364def3efc55b5a0793e1e2c8b1e6e49"
+
+random-bytes@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/random-bytes/-/random-bytes-1.0.0.tgz#4f68a1dc0ae58bd3fb95848c30324db75d64360b"
 
 range-parser@~1.2.0:
   version "1.2.0"
@@ -2022,6 +2098,10 @@ rimraf@2, rimraf@^2.2.8:
   dependencies:
     glob "^7.0.5"
 
+rndm@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/rndm/-/rndm-1.2.0.tgz#f33fe9cfb52bbfd520aa18323bc65db110a1b76c"
+
 run-async@^2.2.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/run-async/-/run-async-2.3.0.tgz#0371ab4ae0bdd720d4166d7dfda64ff7a445a6c0"
@@ -2114,6 +2194,10 @@ set-blocking@^2.0.0, set-blocking@~2.0.0:
 setimmediate@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+
+setprototypeof@1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/setprototypeof/-/setprototypeof-1.0.2.tgz#81a552141ec104b88e89ce383103ad5c66564d08"
 
 setprototypeof@1.0.3:
   version "1.0.3"
@@ -2325,6 +2409,10 @@ tryit@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tryit/-/tryit-1.0.3.tgz#393be730a9446fd1ead6da59a014308f36c289cb"
 
+tsscmp@1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/tsscmp/-/tsscmp-1.0.5.tgz#7dc4a33af71581ab4337da91d85ca5427ebd9a97"
+
 tunnel-agent@^0.6.0:
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/tunnel-agent/-/tunnel-agent-0.6.0.tgz#27a5dea06b36b04a0a9966774b290868f0fc40fd"
@@ -2355,6 +2443,18 @@ typedarray@^0.0.6:
 ua-parser-js@^0.7.9:
   version "0.7.14"
   resolved "https://registry.yarnpkg.com/ua-parser-js/-/ua-parser-js-0.7.14.tgz#110d53fa4c3f326c121292bbeac904d2e03387ca"
+
+uid-safe@2.1.4:
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/uid-safe/-/uid-safe-2.1.4.tgz#3ad6f38368c6d4c8c75ec17623fb79aa1d071d81"
+  dependencies:
+    random-bytes "~1.0.0"
+
+uid-safe@~2.1.4:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/uid-safe/-/uid-safe-2.1.5.tgz#2b3d5c7240e8fc2e58f8aa269e5ee49c0857bd3a"
+  dependencies:
+    random-bytes "~1.0.0"
 
 unpipe@1.0.0, unpipe@~1.0.0:
   version "1.0.0"

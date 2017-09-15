@@ -1,3 +1,6 @@
+body {
+  padding-top: 50px; }
+
 [v-cloak] {
   display: none; }
 
@@ -15,22 +18,29 @@ li {
 p {
   margin: 0 !important; }
 
-.v-board {
-  max-width: 600px;
-  margin: 0 auto; }
-  .v-board h3 {
-    margin: 5px 0 15px 0;
-    padding: 5px 0;
-    border-bottom: 1px solid #ddd;
-    color: olive; }
-  .v-board h4 {
-    color: olive;
-    margin: 20px 0 5px 0; }
+.container {
+  max-width: 800px; }
+
+.main.container {
+  border: 1px solid red;
+  text-align: center; }
+  .main.container label {
+    text-align: left;
+    width: 90px; }
+
+.v-board h3 {
+  margin: 5px 0 15px 0;
+  padding: 5px 0;
+  border-bottom: 1px solid #ddd;
+  color: olive; }
+
+.v-board h4 {
+  color: olive;
+  margin: 20px 0 5px 0; }
 
 .board-section {
   position: absolute;
   top: 5%;
-  width: 600px;
   padding: 10px;
   margin: 20px 0;
   border: 1px solid #ddd;
@@ -76,7 +86,8 @@ p {
     padding-left: 1em; }
     .board-detail .download-file .add-files li {
       margin-top: 1em; }
-      .board-detail .download-file .add-files li img, .board-detail .download-file .add-files li span {
+      .board-detail .download-file .add-files li img,
+      .board-detail .download-file .add-files li span {
         display: block; }
       .board-detail .download-file .add-files li span {
         margin-top: .3em;
@@ -87,7 +98,8 @@ p {
 .board-detail .delete_confirm {
   text-align: right; }
 
-.board-detail .reply-wrap .replies, .board-detail .reply-wrap .add-reply {
+.board-detail .reply-wrap .replies,
+.board-detail .reply-wrap .add-reply {
   padding: 0 20px; }
 
 .board-detail .replies .reply {

@@ -2,18 +2,7 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>BOARD</title>
-  <link rel="stylesheet" href='/stylesheets/style.css' />
-
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-    crossorigin="anonymous">
-  <!-- Optional theme -->
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-    crossorigin="anonymous">
-
+  <% include ./header.ejs %>
 </head>
 <!--
 
@@ -38,7 +27,7 @@ override method: delete, push
 -->
 
 <body>
-  <div id="v-board" class="v-board" v-cloak>
+  <div id="v-board" class="v-board container" v-cloak>
     <!-- list -->
     <div class="board-list">
       <a href="/boards">
@@ -74,7 +63,7 @@ override method: delete, push
       </table>
       <hr>
       <div class="btns">
-        <form action="/boards/search" method="get" id="action-search" name="action-search">
+        <form action="/boards/search" method="get" id="action-search" name="action-search">          
           <input v-model="searchWord" type="text" class="search_word" id="searchWord" name="searchWord">
           <button type="button" v-on:click="searchItemSubmit">검색</button>
         </form>
@@ -99,10 +88,9 @@ override method: delete, push
     <!--// list -->
 
     <!-- new content write form: 새글 쓰기 UI -->
-    <div v-show="onAddNew" id="" class="write_form board-section">
+    <div v-show="onAddNew" id="" class="write_form board-section container">
       <h3>게시글 작성하기</h3>
-      <form id="write-action" action="/boards?mode=add" method="post" enctype="multipart/form-data">
-        <!-- <form id="writeAction" action="/boards/loadFile" method="post" enctype="multipart/form-data"> -->
+      <form id="write-action" action="/boards?mode=add" method="post" enctype="multipart/form-data">        
         <div class="content-title">
           <label class="title-label">제목</label>
           <input v-model="newItem.title" type="text" class="inputSubject" id="addContentSubject" name="addContentSubject" placeholder="제목">
@@ -136,9 +124,9 @@ override method: delete, push
     <!--// new content write form: 새글 쓰기 UI -->
 
     <!-- board detail -->
-    <div v-show="onDetail" class="board-detail board-section">
+    <div v-show="onDetail" class="board-detail board-section container">
       <form id="modify-action" action="">
-        <h3>게시글 자세히 보기</h3>
+        <h3>게시글 자세히 보기</h3>        
         <!-- title -->
         <div class="content-title"><span class="title-label">제목</span> : <input v-model="detail.title" type="text" class="modSubject" id="modContentSubject"
             name="modContentSubject" v-bind:readonly="onEditable" placeholder="제목">
@@ -184,8 +172,7 @@ override method: delete, push
         </ul>
         <h4>댓글달기</h4>
         <hr>
-        <form id="add-reply" class="add-reply" action="" method="post" enctype="multipart/form-data">
-
+        <form id="add-reply" class="add-reply" action="" method="post" enctype="multipart/form-data">          
           <div class="content-title">
             <label class="title-label">작성자</label>
             <input v-bind:value="replyWriter" type="text" class="" id="replyWriter" name="replyWriter" placeholder="작성자">
@@ -200,7 +187,7 @@ override method: delete, push
       </div>
 
       <!--// add reply -->
-      <div class="btns">
+      <div class="btns">          
         <button v-show="!onModify" @click="modifyItem">수정</button>
         <div class="modify-comp" v-show="onModify">
           <p>수정을 완료하시려면 비밀번호를 입력해주세요.</p>
@@ -226,15 +213,7 @@ override method: delete, push
   </div>
 
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
-
-  <!-- Latest compiled and minified JavaScript -->
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-    crossorigin="anonymous"></script>
-
-  <script src="/javascripts/moment.js"></script>
-  <script src="https://unpkg.com/vue"></script>
+  <% include ./footer-js.ejs %>    
   <script src="/javascripts/board-main.js"></script>
 
 </body>

@@ -105,7 +105,8 @@ const boardList = new Vue({
     // 게시글 보기
     showDetail(id) {
       var self = this;
-      $.get(`api/boards/view?id=${id}`, function (data, status) {
+      // $.get(`api/boards/view?id=${id}`, function (data, status) {
+      $.get(`api/boards/${id}`, function (data, status) {
         self.detail = data.content;
         self.items.forEach(function (item, idx) {
           if (item._id === self.detail._id) item.count++;
@@ -167,29 +168,27 @@ const boardList = new Vue({
     addItemCancle() {
       this.onAddNew = false;
     },
-    modifyItem() {
-      this.onModify = "readonly";
-      this.detail.contentsOri = this.detail.contents; 
+    //=== 게시글 수정
+    modifyItem(){
+      this.detail.contentsOri = this.detail.contents;
       this.detail.titleOri = this.detail.title;
-      this.modPw = '';    
-    },
-    
-    // 수정완료
-    modifyItemComp() {           
-      var self = this;          
+      this.modPw = '';
+      this.onModify = true;
+    },    
+    modifyItemComp(){
+      var self = this;
       
       $.ajax({
         type: 'POST',
         url: 'api/boards?_method=PUT',
         data: $('#modify-action').serialize(),
         async: false,
-        success(data) {
-          if (data.notice) {
-            alert('비밀번호가 일치하지 않습니다.');
-          } else {
-            self.initView();
-            self.getPage();
-          }
+        success(data){
+          self.initView();
+          self.getPage();
+        },
+        error(status){
+          alert('비밀번호가 일치하지 않습니다.');
         }
       });
     },
@@ -200,18 +199,23 @@ const boardList = new Vue({
       this.detail.contents = this.detail.contentsOri;
       this.detail.title = this.detail.titleOri;            
     },
+    //=== 게시글 삭제
     deleteItem() {
       var self = this;
       $.ajax({
         type: 'POST',
         url: `api/boards?_method=DELETE&id=${this.detail._id}&pw=${this.delPw}`,
-        success(data) {
-          if (data.notice) {
+        success( status, data ) {
+          if (status) {
             alert('비밀번호가 일치하지 않습니다.');
           } else {
             self.initView();
             self.getPage();
           }
+        }, 
+        error(status){
+          alert('');
+
         }
       });
     },
@@ -257,20 +261,20 @@ const boardList = new Vue({
       var endNum = thisPage.groupCurrent *thisPage.groupLimit;          
       if( endNum > this.objPage.total ) endNum = this.objPage.total;
 
-      thisPage.listCurrent = thisPage.list.slice(startNum, endNum);  
-      console.dir(  thisPage.listCurrent  );   
+      thisPage.listCurrent = thisPage.list.slice(startNum, endNum);        
     },
-    // reply 
+    //=== reply 
     addReply(){
       var self = this;           
       $.ajax({
         type: 'POST',
-        url: 'api/boards/reply',
+        // url: 'api/boards/reply',
+        url: 'api/boards-reply',
         data: $('#add-reply').serialize(),
         async: false,
-        success(data) {
-          self.initView();
-          self.getPage();
+        success(data) {          
+          self.showDetail(self.detail._id);
+          
         }
       });   
     } 

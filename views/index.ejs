@@ -1,11 +1,66 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+
+<head>
+  <% include ./header.ejs %>
+</head>
+
+<body>
+  <div id="indexMain" class="container main" v-cloak>
+    <h1>
+      <%= title %>
+    </h1>
+    <p>Welcome to
+      <%= title %>
+    </p>
+    <!-- <div class="btns">      
+      <a href="http://localhost:3000/login">로그인</a>
+      <a href="http://localhost:3000/signup">회원가입</a>      
+    </div> -->
+
+
+    <h1>SIGNUP</h1>
+    <form action="/signup" method="post">
+      <div>
+        <label>Username:</label>
+        <input type="text" name="name" />
+      </div>
+      <div>
+        <label>email:</label>
+        <input type="text" name="email" />
+      </div>
+      <div>
+        <label>Password:</label>
+        <input type="password" name="password" />
+      </div>
+      <div>
+        <input type="submit" value="Signup" />
+      </div>
+    </form>
+
+    <h1>Login</h1>
+    <form action="/login" method="post">
+      <div>
+        <label>Username:</label>
+        <input type="text" name="name" />
+      </div>
+      <div>
+        <label>email:</label>
+        <input type="text" name="email" />
+      </div>
+      <div>
+        <label>Password:</label>
+        <input type="password" name="password" />
+      </div>
+      <div>
+        <input type="submit" value="Login" />
+      </div>
+    </form>
+
+  </div>
+
+  <% include ./footer-js.ejs %>
+  <script src="/javascripts/index.js"></script>  
+</body>
+
 </html>

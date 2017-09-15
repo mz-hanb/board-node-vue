@@ -7,6 +7,9 @@ module.exports = {
         "mongo": true
     },
     "rules": {
+    	"react/jsx-no-bind": "off"
+    },
+    "rules": {
         "consistent-return": 2,
         "indent"           : [0, 2],
         "no-else-return"   : 1,
