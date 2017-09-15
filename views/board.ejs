@@ -76,7 +76,8 @@ override method: delete, push
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
-          <li v-for="(pageItem, idx) in objPage.listCurrent"><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>
+          <!-- page number -->
+<li v-for="(pageItem, idx) in objPage.listCurrent"><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>
           <li class="btn-next-pagegroup">
             <a v-on:click="goNextPageGroup" href="#" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>

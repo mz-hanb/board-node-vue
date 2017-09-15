@@ -73,7 +73,9 @@ const boardList = new Vue({
     getListNum(idx){      
       return (this.objPage.pageCurrent-1) * 2 + idx + 1;
     },
-    getPage(page, searchWord) {            
+    getPage(page, searchWord) {       
+      console.log('fn:getPage' );      
+
       var self = this;
       var thisPage = this.objPage;      
       // page 
@@ -85,11 +87,24 @@ const boardList = new Vue({
 
       $.get(`api/boards/get-list?page=${page}&searchWord=${searchWord}`, function (data, status) {
         self.items = data.contents;
-        thisPage.total = data.pagination; // 총 페이지 수                
-        //--- 페이지네이션 그룹식별(한 페이지네이션 3페이지씩 보여줌 )을 위해
-        for (var i = 0; i < thisPage.total; i++) {          
-          thisPage.list.push({ page: i + 1, pageGroup: Math.ceil((i + 1) / thisPage.groupLimit) });
-        }     
+
+        //=== pagenation
+        thisPage.total = data.pagination; // 총 페이지 수     
+        thisPage.list = [];                          
+
+        var pageNum = 0;
+        var pageGropNum = 0;
+
+        for (var i = 0; i < thisPage.total; i++) {
+          pageGropNum = Math.ceil((i + 1) / thisPage.groupLimit);          
+          pageNum = i+1;
+
+          thisPage.list.push({
+            page: pageNum,
+            pageGroup: pageGropNum
+          });
+          // console.log(i + '> ' + pageNum + '// ' + pageGropNum);
+        }             
         // 그룹 총 개수
         thisPage.groupTotal = Math.ceil(thisPage.total / thisPage.groupLimit);        
 
@@ -97,8 +112,9 @@ const boardList = new Vue({
         var objCurrentPage = thisPage.list.filter(function (item, index, array) {
           if (item.page === page) return item;
         });
-        thisPage.groupCurrent = objCurrentPage[0].pageGroup;    
-        self.getCurrentPageList();        
+        thisPage.groupCurrent = objCurrentPage[0].pageGroup;            
+
+        self.getCurrentPageList();   
         
       });
     },
@@ -142,11 +158,8 @@ const boardList = new Vue({
         this.getPage(1, this.searchWord);
       }
     },
-    addItemSubmit() {
-      // if (this.newItem.title === '' || this.newItem.writer === '' || this.newItem.password === '' || this.newItem.contents === '') {
-      //   alert('제목과 내용, 작성자 비밀번호 모두 있어야합니다.');
-      //   return;
-      // }
+    // 새글 작성
+        addItemSubmit() {      
       var self = this;
       var form = $('#write-action')[0];
       var formData = new FormData(form);
@@ -256,9 +269,9 @@ const boardList = new Vue({
         this.objPage.groupCurrent = this.objPage.groupTotal;
         return;
       } 
-      var thisPage = this.objPage;
+      var thisPage = this.objPage;      
       var startNum = (thisPage.groupCurrent-1) *thisPage.groupLimit;
-      var endNum = thisPage.groupCurrent *thisPage.groupLimit;          
+      var endNum = thisPage.groupCurrent * thisPage.groupLimit;                
       if( endNum > this.objPage.total ) endNum = this.objPage.total;
 
       thisPage.listCurrent = thisPage.list.slice(startNum, endNum);        
