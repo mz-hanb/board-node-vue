@@ -10,6 +10,7 @@ const mongoose = require('mongoose');
 const methodOverride = require('method-override');
 const passport = require('passport');
 const session = require('express-session');
+const flash = require('connect-flash');
 
 const boards = require('./routes/boards');
 const boardsApi = require('./routes/boards-api');
@@ -65,6 +66,7 @@ app.use(session({
 require('./config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(flash());
 
 
 // router

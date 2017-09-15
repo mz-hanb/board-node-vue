@@ -1,7 +1,22 @@
 /** *********************************************
  * vue
  * *********************************************/
+Vue.component('del-reply',{
+  template: `
+  <div>
+    <input type="text" placeholder="비밀번호를 입력해주세요." v-model:delPw="replyDelPw"  :id="replyDelPw" :name="replyDelPw" >
+    <slot></slot>
+  </div>
+  `,
+  props: {
+    delPw: '',
+    id: '',
+    name: ''
+  },  
+  methods: {    
+  }
 
+});
 
 // 게시판
 const boardList = new Vue({
@@ -41,7 +56,8 @@ const boardList = new Vue({
     replies: [],
     onShowReplies: false,
     replyWriter: '',
-    replyComment: ''
+    replyComment: '', 
+    replyDelPw: ''
   },
   mounted(){    
   },
@@ -142,6 +158,7 @@ const boardList = new Vue({
         self.replies = self.detail.comments;   
         self.replyWriter = ''; 
         self.replyComment = '';   
+        self.replyDelPw = '';
         // console.log( 'shoeDetail> ' + self.detail.title);
       });
     },
@@ -291,6 +308,25 @@ const boardList = new Vue({
           
         }
       });   
+    },
+    delReply(){
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        url: `api/boards-reply?_method=DELETE&id=${this.detail._id}&pw=${this.replyDelPw}`,
+        success( status, data ) {
+          if (status) {
+            alert('비밀번호가 일치하지 않습니다.');
+          } else {
+            self.showDetail(self.detail._id);
+            console.log( '///// ' )
+          }
+        }, 
+        error(status){
+          alert('');
+        }
+      }); 
+
     } 
   }
 });

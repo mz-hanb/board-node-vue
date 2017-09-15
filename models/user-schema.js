@@ -5,7 +5,7 @@ var bcrypt = require('bcrypt-nodejs');
 
 var userSchema = mongoose.Schema({
     name: String,
-    emial: String,
+    email: String,
     password: String   
 });
 
@@ -16,7 +16,8 @@ userSchema.methods.generateHash = function(password){
 
 // password 의 유효성 검증
 userSchema.methods.validPassword = function(password){
-    return bcrypt.compareSync(password, this.local.password );
+    console.log(this.password);
+    return bcrypt.compareSync(password, this.password );
 }
 
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User2', userSchema);

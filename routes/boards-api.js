@@ -123,8 +123,7 @@ router.put('/', csrfProtection, (req, res) => {
   // console.log( 'modPassword ///' + modPassword  );
   // console.log( 'modFiles ///' + modFiles  );
   checkPassword(modId, modPassword, (err, rowContents) => {
-    if (err) console.log('//////////////////////////////err');
-
+    // if (err) console.log('//////////////////////////////err');
     if (modFiles) {
       var list = modFiles.split(',');
       rowContents.fileUp.forEach((idx, fileData) => {

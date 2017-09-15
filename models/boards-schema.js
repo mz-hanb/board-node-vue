@@ -8,8 +8,10 @@ var boardSchema = mongoose.Schema({
     contents: String,
     comments: [{
         name: String,
+        pw: String,
         memo: String,
-        date: {type: Date, default: Date.now}
+        date: {type: Date, default: Date.now},
+        removed: {type:Boolean, default: false}
     }],
     count: {type: Number, default: 0},
     date: {type: Date, default: Date.now},
