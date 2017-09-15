@@ -73,8 +73,7 @@ const boardList = new Vue({
     getListNum(idx){      
       return (this.objPage.pageCurrent-1) * 2 + idx + 1;
     },
-    getPage(page, searchWord) {       
-      console.log('fn:getPage' );      
+    getPage(page, searchWord) {            
 
       var self = this;
       var thisPage = this.objPage;      
@@ -85,7 +84,9 @@ const boardList = new Vue({
       // search word
       if (searchWord === null || searchWord === undefined) searchWord = '';
 
-      $.get(`api/boards/get-list?page=${page}&searchWord=${searchWord}`, function (data, status) {
+      // $.get(`api/boards/get-list?page=${page}&searchWord=${searchWord}`, function (data, status) {
+      $.get(`api/boards?page=${page}&searchWord=${searchWord}`, function (data, status) {
+        // $.get(`api/boards/${page}?searchWord=${searchWord}`, function (data, status) {
         self.items = data.contents;
 
         //=== pagenation
@@ -114,9 +115,9 @@ const boardList = new Vue({
         });
         thisPage.groupCurrent = objCurrentPage[0].pageGroup;            
 
-        self.getCurrentPageList();   
-        
+        self.getCurrentPageList();           
       });
+      
     },
     // 게시글 보기
     showDetail(id) {
@@ -141,7 +142,7 @@ const boardList = new Vue({
         self.replies = self.detail.comments;   
         self.replyWriter = ''; 
         self.replyComment = '';   
-        console.log( 'shoeDetail> ' + self.detail.title);
+        // console.log( 'shoeDetail> ' + self.detail.title);
       });
     },
     setLoadedFile(list) {

@@ -72,14 +72,14 @@ override method: delete, push
       <nav class="pagination-wrap" aria-label="Page navigation">
         <ul class="pagination">
           <li class="btn-prev-pagegroup">
-            <a v-on:click="goPrevPageGroup" href="#" aria-label="Previous">
+            <a v-on:click="goPrevPageGroup" href="javascript: void(0)" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
           <!-- page number -->
-<li v-for="(pageItem, idx) in objPage.listCurrent"><a v-on:click="getPage(pageItem.page, searchWord)" href="#">{{pageItem.page}}</a></li>
+<li v-for="(pageItem, idx) in objPage.listCurrent"><a v-on:click="getPage(pageItem.page, searchWord)" href="javascript: void(0)">{{pageItem.page}}</a></li>
           <li class="btn-next-pagegroup">
-            <a v-on:click="goNextPageGroup" href="#" aria-label="Next">
+            <a v-on:click="goNextPageGroup" href="javascript: void(0)" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>

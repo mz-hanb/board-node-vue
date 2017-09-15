@@ -20,12 +20,15 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-const router = express.Router();
 var limitSize = 2; // 페이지당 게시글 수 
+
+const router = express.Router();
 
 //= ==
 // 
-router.get('/get-list', csrfProtection, (req, res) => {
+router.get('/', csrfProtection, (req, res) => {
+  // router.get('/:page', csrfProtection, (req, res) => {
+
   const search_word = req.param('searchWord');
   const searchCondition = { $regex: search_word };
 
@@ -51,6 +54,7 @@ router.get('/get-list', csrfProtection, (req, res) => {
 //  /:id
 // router.get('/view', csrfProtection, (req, res) => {
 router.get('/:id', csrfProtection, (req, res) => {
+  // console.log('////id' + req.param('id'));
 
   // 글 보는 부분. 글 내용을 출력하고 조회수를 늘려줘야함
   // 댓글 페이지 추가 해줌, 5개씩 출력함
