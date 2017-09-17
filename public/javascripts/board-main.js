@@ -1,19 +1,46 @@
 /** *********************************************
  * vue
  * *********************************************/
-Vue.component('del-reply',{
+Vue.component('reply', {
   template: `
   <div>
-    <input type="text" placeholder="비밀번호를 입력해주세요." v-model:delPw="replyDelPw"  :id="replyDelPw" :name="replyDelPw" >
-    <slot></slot>
+    <p class=""><span class="">작성자: </span>{{writer}}</p>   
+    <p class=""><span class="">내용: </span>{{memo}}</p> 
+    <input type="text" placeholder="비밀번호를 입력해주세요." name="replyDelPw" v-model="replyDelPw">
+    <button type="button" @click="delReply">댓글삭제</button></div>
   </div>
   `,
-  props: {
-    delPw: '',
-    id: '',
-    name: ''
-  },  
+  props: [
+    'writer', 'memo', 'parent'
+  ],  
+  data(){
+    return{
+      replyDelPw: ''
+    }
+  }, 
   methods: {    
+    updateVal(val){
+      this.$emit('input', pw);
+    },
+    delReply(){
+      // console.log( '////' + this.replyDelPw );
+      var self = this;
+      $.ajax({
+        type: 'POST',
+        url: `api/boards-reply?_method=DELETE&id=${this.parent}&pw=${this.replyDelPw}`,
+        success( status, data ) {
+          if (status) {
+            alert('비밀번호가 일치하지 않습니다.');
+          } else {            
+            self.$emit('secess');
+            console.log( ' ///// success ' );
+          }
+        }, 
+        error(status){
+          alert('');
+        }
+      }); 
+    }
   }
 
 });
@@ -57,7 +84,7 @@ const boardList = new Vue({
     onShowReplies: false,
     replyWriter: '',
     replyComment: '', 
-    replyDelPw: ''
+    replyAddPw: ''
   },
   mounted(){    
   },
@@ -158,7 +185,7 @@ const boardList = new Vue({
         self.replies = self.detail.comments;   
         self.replyWriter = ''; 
         self.replyComment = '';   
-        self.replyDelPw = '';
+        self.replyAddPw = '';
         // console.log( 'shoeDetail> ' + self.detail.title);
       });
     },
@@ -308,26 +335,7 @@ const boardList = new Vue({
           
         }
       });   
-    },
-    delReply(){
-      var self = this;
-      $.ajax({
-        type: 'POST',
-        url: `api/boards-reply?_method=DELETE&id=${this.detail._id}&pw=${this.replyDelPw}`,
-        success( status, data ) {
-          if (status) {
-            alert('비밀번호가 일치하지 않습니다.');
-          } else {
-            self.showDetail(self.detail._id);
-            console.log( '///// ' )
-          }
-        }, 
-        error(status){
-          alert('');
-        }
-      }); 
-
-    } 
+    }
   }
 });
 

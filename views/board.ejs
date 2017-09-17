@@ -164,15 +164,11 @@ override method: delete, push
       <!-- reply -->
       <div class="reply-wrap">
         <h4>댓글목록</h4>
-        <hr>
-        <!-- <reply></reply>   -->
+        <hr>        
         <ul class="replies">
-          <li class="reply" v-for="reply in replies" >
-            <p class="writer"><span class="label">작성자: </span>{{reply.name}}</p>
-            <p class="contents">{{reply.memo}}</p>
-            <!-- <div><input type="text" placeholder="비밀번호를 입력해주세요." v-model="replyDelPw"  id="replyDelPw" name="replyDelPw" > <button type="button" @click="delReply">댓글삭제</button></div> -->
-            <del-reply><button type="button" @click="delReply">댓글삭제</button></div></del-reply>
-          </li>
+          <li class="reply" v-for="item in replies">
+            <reply :writer="item.name" :memo="item.memo" :parent="detail._id" @secess="showDetail(detail._id)"  ></reply>
+          </li>          
         </ul>
         <h4>댓글달기</h4>
         <hr>
@@ -186,7 +182,7 @@ override method: delete, push
             <textarea v-bind:value="replyComment" class="replyComment" id="replyComment" name="replyComment"></textarea>            
           </div>
           <input type="hidden" v-bind:value="detail._id" id="replyId" name="replyId">
-          <div><input type="text" placeholder="비밀번호를 입력해주세요." id="replyAddPw" name="replyAddPw"> <button type="button" @click="addReply">댓글달기</button></div>
+          <div><input type="text" placeholder="비밀번호를 입력해주세요." v-bind:value="replyAddPw"  id="replyAddPw" name="replyAddPw"> <button type="button" @click="addReply">댓글달기</button></div>
         </form>
       </div>
       <!--// reply -->
